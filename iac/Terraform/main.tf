@@ -26,12 +26,14 @@ resource "ibm_is_vpc" "vpc_cluster" {
   resource_group    = var.resource_group_id
 }
 
-resource "ibm_is_ssh_key" "ssh_key" {
-  name       = "ssh-key-vsanchez"
-  public_key = var.public_ssh_key
-  type       = "rsa"
-  resource_group = var.resource_group_id
-}
+# resource "ibm_is_ssh_key" "ssh_key" {
+#   name       = "ssh-key-ctenorio"
+#   public_key = var.public_ssh_key
+#   type       = "rsa"
+#   resource_group = var.resource_group_id
+# }
+
+
 
 # Subnet vm
 resource "ibm_is_subnet" "subnet_vm" {
@@ -91,7 +93,7 @@ resource "ibm_is_instance" "vm_db" {
   image             = "r018-941eb02e-ceb9-44c8-895b-b31d241f43b5" 
   profile           = "bx2-2x8"
   resource_group = var.resource_group_id
-  keys = [ ibm_is_ssh_key.ssh_key.id ]
+  #keys = [ ibm_is_ssh_key.ssh_key.id ]
 
     primary_network_interface {
     subnet            = ibm_is_subnet.subnet_vm.id
