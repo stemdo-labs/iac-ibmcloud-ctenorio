@@ -18,7 +18,3 @@ variable "zone" {
   type        = string
 }
 
-variable "private_ip" {
-  description = "IP privada"
-  type        = string
-}
