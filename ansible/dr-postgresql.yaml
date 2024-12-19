@@ -1,0 +1,35 @@
+- name: Restaurar Backup de PostgreSQL
+  hosts: postgresql_servers
+  become: yes
+  vars:
+    DB_NAME: "{{ lookup('env', 'DB_NAME') }}"
+    DB_USER_POSTGRES: "{{ lookup('env', 'DB_USER_POSTGRES') }}"
+    ENCRYPTION_KEY: "{{ lookup('env', 'ENCRYPTION_KEY') }}"
+    PGPASSWORD: "{{ lookup('env', 'PGPASSWORD') }}"
+    BACKUP_FILE: "{{ lookup('env', 'BACKUP_FILE') }}"
+    RESTORE_DIR: "/home/adminuser/restores"
+    DECRYPTED_FILE: "{{ BACKUP_FILE | regex_replace('.enc$', '') }}"
+
+  tasks:
+    - name: Crear directorio de restauraciones si no existe
+      file:
+        path: "{{ RESTORE_DIR }}"
+        state: directory
+        mode: '0755'
+
+    - name: Desencriptar el archivo de backup
+      shell: |
+        openssl enc -d -aes-256-cbc -in {{ BACKUP_FILE }} -out {{ DECRYPTED_FILE }} -k "{{ ENCRYPTION_KEY }}"
+      register: decrypt_result
+      failed_when: decrypt_result.rc != 0
+
+    - name: Restaurar la base de datos desde el archivo desencriptado
+      shell: |
+        PGPASSWORD={{ PGPASSWORD }} psql -U {{ DB_USER_POSTGRES }} -d {{ DB_NAME }} -f {{ DECRYPTED_FILE }}
+      register: restore_result
+      failed_when: restore_result.rc != 0
+
+    - name: Limpiar archivo desencriptado después de la restauración
+      file:
+        path: "{{ DECRYPTED_FILE }}"
+        state: absent

@@ -1,0 +1,31 @@
+- name: PostgreSQL Backup
+  hosts: postgresql_servers
+  become: yes
+  vars:
+    DB_NAME: "{{ lookup('env', 'DB_NAME') }}"
+    DB_USER_POSTGRES: "{{ lookup('env', 'DB_USER_POSTGRES') }}"
+    backup_file_name: "/home/adminuser/backups/backup_{{ ansible_date_time.date }}_{{ ansible_date_time.time}}.sql.gz.enc"
+    local_backup_dir:  "/home/adminuser/backups"
+    ENCRYPTION_KEY: "{{ lookup('env', 'ENCRYPTION_KEY') }}"
+    PGPASSWORD: "{{ lookup('env', 'PGPASSWORD') }}"
+
+  tasks:
+    # - name: Crear directorio de backups si no existe
+    #   file:
+    #     path: /var/backups/postgres/backups/
+    #     state: directory
+    #     mode: '0755'
+
+    - name: Realizar backup de la base de datos PostgreSQL
+      shell: |
+        PGPASSWORD={{ PGPASSWORD }} pg_dump -U {{ DB_USER_POSTGRES }} {{ DB_NAME }} | gzip | openssl enc -aes-256-cbc -salt -out {{ backup_file_name }} -k "{{ ENCRYPTION_KEY }}"
+      register: backup_result
+      failed_when: backup_result.rc != 0
+
+    - name: Descargar el archivo de backup al controlador Ansible
+      fetch:
+        src: "{{ backup_file_name }}"
+        dest: "{{ local_backup_dir }}/"
+        flat: yes
+
+      

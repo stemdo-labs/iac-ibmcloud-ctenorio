@@ -1,0 +1,25 @@
+frontend:
+  replicas: 1
+  imagePullSecrets: ""
+  namespace: "ns-cntenorio"
+  image:
+    repository: acrcntenorio.azurecr.io/frontend-app
+    tag: latest
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "250m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  livenessProbe:
+    initialDelaySeconds: 10
+    periodSeconds: 15
+  ingress:
+    enabled: true                    
+    hosts:                            
+      - host: cntenorio.rrhh.local          
+        paths: ["/"]  

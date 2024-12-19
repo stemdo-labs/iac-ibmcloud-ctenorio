@@ -1,0 +1,33 @@
+
+backend:
+  name: backend  # Nombre del backend
+  replicas: 1  # Número de réplicas
+  imagePullSecrets: ""
+  namespace: "ns-cntenorio"
+  image:
+    repository: acrcntenorio.azurecr.io/backend-app
+    tag: latest
+  port: 8080  # Puerto de la aplicación
+  SPRING_DB_HOST: "localhost"
+  SPRING_DB_PORT: "5432"
+  SPRING_DB_NAME: "mydatabase"
+  SPRING_DB_USER: "myuser"
+  SPRING_DB_PASSWORD: "mypassword"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "250m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+  readinessProbe:
+    initialDelaySeconds: 50
+    periodSeconds: 10
+  livenessProbe:
+    initialDelaySeconds: 40
+    periodSeconds: 10
+  service:
+    port: 80
+    targetPort: 8080
+    type: ClusterIP
+
