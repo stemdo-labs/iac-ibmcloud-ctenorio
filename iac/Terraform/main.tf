@@ -30,7 +30,7 @@ resource "ibm_is_ssh_key" "ssh_key" {
   name       = "ssh-key-vsanchez"
   public_key = var.public_ssh_key
   type       = "rsa"
-  resource_group = var.rg-name
+  resource_group = var.resource_group_id
 }
 
 # Subnet vm
