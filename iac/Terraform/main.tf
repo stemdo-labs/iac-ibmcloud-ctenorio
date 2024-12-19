@@ -16,13 +16,13 @@ provider "ibm" {
 
 # Virtual Private Cloud (VPC)
 resource "ibm_is_vpc" "vpc" {
-  name              = "vpc-vm"
+  name              = "vpc-vm-ctenorio"
   resource_group    = var.resource_group_id
 
 }
 
 resource "ibm_is_vpc" "vpc_cluster" {
-  name              = "vpc-cluster"
+  name              = "vpc-cluster-ctenorio"
   resource_group    = var.resource_group_id
 }
 
@@ -38,7 +38,7 @@ resource "ibm_is_subnet" "subnet_vm" {
 # Subnet cluster
 resource "ibm_is_subnet" "subnet_cluster" {
   name              = "subnet-cluster"
-  ipv4_cidr_block   = "10.242.64.0/24"
+  ipv4_cidr_block   = "10.242.1.0/24"
   vpc               = ibm_is_vpc.vpc_cluster.id
   zone              = var.zone
   resource_group    = var.resource_group_id
