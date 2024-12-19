@@ -30,7 +30,7 @@ resource "ibm_is_vpc" "vpc_cluster" {
 # Subnet vm
 resource "ibm_is_subnet" "subnet_vm" {
   name              = "subnet-vm"
-  ipv4_cidr_block   = "10.0.242.0/24"
+  ipv4_cidr_block   = "10.242.0.0/24"
   vpc               = ibm_is_vpc.vpc.id
   zone              = var.zone
   resource_group    = var.resource_group_id
@@ -39,7 +39,7 @@ resource "ibm_is_subnet" "subnet_vm" {
 # Subnet cluster
 resource "ibm_is_subnet" "subnet_cluster" {
   name              = "subnet-cluster"
-  ipv4_cidr_block   = "10.0.242.0/24"
+  ipv4_cidr_block   = "10.242.0.0/24"
   vpc               = ibm_is_vpc.vpc_cluster.id
   zone              = var.zone
   resource_group    = var.resource_group_id
