@@ -30,7 +30,7 @@ resource "ibm_is_vpc" "vpc" {
 # Subnet
 resource "ibm_is_subnet" "subnet_db" {
   name              = "subnet-db"
-  ipv4_cidr_block   = "10.0.1.0/24"
+  ipv4_cidr_block   = "10.0.242.0/24"
   vpc               = ibm_is_vpc.vpc.id
   zone              = var.zone
   resource_group    = var.resource_group_id
@@ -62,6 +62,7 @@ resource "ibm_is_instance" "vm_db" {
     primary_network_interface {
     subnet            = ibm_is_subnet.subnet_vm.id
     allow_ip_spoofing = true
+    
     primary_ip {
       auto_delete = false
       address     = "10.242.0.4"
@@ -71,7 +72,7 @@ resource "ibm_is_instance" "vm_db" {
 }
 
 # IBM Container Registry (ICR)
-resource "ibm_container_registry" "icr" {
+resource "ibm_cr_namespace" "icr" {
   name            = "icr-final-project"
   resource_group  = var.resource_group_id
   location        = var.region
