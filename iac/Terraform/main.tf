@@ -16,13 +16,13 @@ provider "ibm" {
 
 # Virtual Private Cloud (VPC)
 resource "ibm_is_vpc" "vpc" {
-  name              = "vpc-vm"
+  name              = "vpc-vm-ctenorio"
   resource_group    = var.resource_group_id
 
 }
 
 resource "ibm_is_vpc" "vpc_cluster" {
-  name              = "vpc-cluster"
+  name              = "vpc-cluster-ctenorio"
   resource_group    = var.resource_group_id
 }
 
