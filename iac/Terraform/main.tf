@@ -15,7 +15,7 @@ provider "ibm" {
 
 # Virtual Private Cloud (VPC)
 resource "ibm_is_vpc" "vpc" {
-  name              = "vpc-final-project"
+  name              = "vpc-vm"
   resource_group    = var.resource_group_id
   classic_access    = false
 
@@ -27,9 +27,31 @@ resource "ibm_is_vpc" "vpc" {
   }
 }
 
-# Subnet
+resource "ibm_is_vpc" "vpc_cluster" {
+  name              = "vpc-cluster"
+  resource_group    = var.resource_group_id
+  classic_access    = false
+
+  default_network_acl {
+    name = "default-acl"
+  }
+  default_security_group {
+    name = "default-sg"
+  }
+}
+
+# Subnet db
 resource "ibm_is_subnet" "subnet_db" {
   name              = "subnet-db"
+  ipv4_cidr_block   = "10.0.242.0/24"
+  vpc               = ibm_is_vpc.vpc.id
+  zone              = var.zone
+  resource_group    = var.resource_group_id
+}
+
+# Subnet cluster
+resource "ibm_is_subnet" "subnet_cluster" {
+  name              = "subnet-cluster"
   ipv4_cidr_block   = "10.0.242.0/24"
   vpc               = ibm_is_vpc.vpc.id
   zone              = var.zone
@@ -62,7 +84,7 @@ resource "ibm_is_instance" "vm_db" {
     primary_network_interface {
     subnet            = ibm_is_subnet.subnet_vm.id
     allow_ip_spoofing = true
-    
+
     primary_ip {
       auto_delete = false
       address     = "10.242.0.4"
@@ -76,4 +98,27 @@ resource "ibm_cr_namespace" "icr" {
   name            = "icr-final-project"
   resource_group  = var.resource_group_id
   location        = var.region
+}
+
+resource "ibm_resource_instance" "cos_instance" {
+  name     = "os_instance"
+  service  = "cloud-object-storage"
+  plan     = "standard"
+  location = "global"
+}
+
+# Clúster de Kubernetes (VPC)
+resource "ibm_container_vpc_cluster" "cluster" {
+  name              = "cntenorio-vpc-cluster"
+  vpc_id            = ibm_is_vpc.vpc_cluster.id
+  kube_version      = "4.16.23_openshift"
+  flavor            = "bx2.4x16"
+  worker_count      = "2"
+  cos_instance_crn  = ibm_resource_instance.cos_instance.id
+  resource_group_id = var.resource_group_id
+
+  zones {
+    subnet_id = ibm_is_subnet.subnet_cluster.id
+    name      = var.zone
+  }
 }
