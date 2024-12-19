@@ -61,7 +61,7 @@ resource "ibm_is_floating_ip" "public_ip_db" {
 resource "ibm_is_security_group" "ssh_security_group" {
   name   = "ssh-security-group-cntenorio"
   vpc    = ibm_is_vpc.vpc.id
-  resource_group = var.rg-name
+  resource_group = var.resource_group_id
 }
  
 # Crear una regla para habilitar el puerto 22 (SSH)
@@ -92,7 +92,7 @@ resource "ibm_is_instance" "vm_db" {
   profile           = "bx2-2x8"
   resource_group = var.resource_group_id
   keys = [ ibm_is_ssh_key.ssh_key.id ]
-  
+
     primary_network_interface {
     subnet            = ibm_is_subnet.subnet_vm.id
     allow_ip_spoofing = true
