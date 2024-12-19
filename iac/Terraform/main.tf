@@ -19,12 +19,6 @@ resource "ibm_is_vpc" "vpc" {
   resource_group    = var.resource_group_id
   classic_access    = false
 
-  default_network_acl {
-    name = "default-acl"
-  }
-  default_security_group {
-    name = "default-sg"
-  }
 }
 
 resource "ibm_is_vpc" "vpc_cluster" {
@@ -40,9 +34,9 @@ resource "ibm_is_vpc" "vpc_cluster" {
   }
 }
 
-# Subnet db
-resource "ibm_is_subnet" "subnet_db" {
-  name              = "subnet-db"
+# Subnet mv
+resource "ibm_is_subnet" "subnet_mv" {
+  name              = "subnet-vm"
   ipv4_cidr_block   = "10.0.242.0/24"
   vpc               = ibm_is_vpc.vpc.id
   zone              = var.zone
@@ -61,16 +55,9 @@ resource "ibm_is_subnet" "subnet_cluster" {
 # Public IP
 resource "ibm_is_floating_ip" "public_ip_db" {
   name   = "public-ip-db"
-  region = var.region
+  target = ibm_is_instance.vm_db.primary_network_interface[0].id
 }
 
-# Network Interface
-resource "ibm_is_instance_interface" "nic_db" {
-  name       = "nic-db"
-  subnet     = ibm_is_subnet.subnet_db.id
-  primary    = true
-  security_groups = [ibm_is_vpc.vpc.default_security_group]
-}
 
 # Máquina Virtual (VM) para la base de datos
 resource "ibm_is_instance" "vm_db" {
@@ -94,10 +81,9 @@ resource "ibm_is_instance" "vm_db" {
 }
 
 # IBM Container Registry (ICR)
-resource "ibm_cr_namespace" "icr" {
-  name            = "icr-final-project"
-  resource_group  = var.resource_group_id
-  location        = var.region
+resource "ibm_cr_namespace" "rg_namespace" {
+  name              = "ctenorio-cr"
+  resource_group_id = var.resource_group_id
 }
 
 resource "ibm_resource_instance" "cos_instance" {
