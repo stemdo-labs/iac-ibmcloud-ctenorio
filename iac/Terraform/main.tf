@@ -11,20 +11,19 @@ terraform {
 
 provider "ibm" {
   ibmcloud_api_key = var.ibmcloud_api_key
+  region = var.region
 }
 
 # Virtual Private Cloud (VPC)
 resource "ibm_is_vpc" "vpc" {
   name              = "vpc-vm"
   resource_group    = var.resource_group_id
-  classic_access    = false
 
 }
 
 resource "ibm_is_vpc" "vpc_cluster" {
   name              = "vpc-cluster"
   resource_group    = var.resource_group_id
-  classic_access    = false
 }
 
 # Subnet vm
