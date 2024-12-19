@@ -25,6 +25,7 @@ resource "ibm_is_vpc" "vpc_cluster" {
   name              = "vpc-cluster"
   resource_group    = var.resource_group_id
   classic_access    = false
+  
 }
 
 # Subnet vm
@@ -49,6 +50,7 @@ resource "ibm_is_subnet" "subnet_cluster" {
 resource "ibm_is_floating_ip" "public_ip_db" {
   name   = "public-ip-db"
   target = ibm_is_instance.vm_db.primary_network_interface[0].id
+  resource_group_id = var.resource_group_id
 }
 
 
@@ -84,6 +86,7 @@ resource "ibm_resource_instance" "cos_instance" {
   service  = "cloud-object-storage"
   plan     = "standard"
   location = "global"
+  resource_group_id = var.resource_group_id
 }
 
 # Clúster de Kubernetes (VPC)
