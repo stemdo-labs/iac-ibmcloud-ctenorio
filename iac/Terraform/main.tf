@@ -71,7 +71,7 @@ resource "ibm_is_security_group" "ssh_security_group" {
 resource "ibm_is_security_group_rule" "allow_ssh" {
   direction      = "inbound"
   remote         = "0.0.0.0/0"
-  ip_version     = "ipv4"
+
   group =  ibm_is_security_group.ssh_security_group.id
   tcp {
   port_min       = 22
@@ -84,7 +84,7 @@ resource "ibm_is_security_group_rule" "allow_ssh" {
 resource "ibm_is_security_group_rule" "allow_outbound" {
   direction      = "outbound"
   remote         = "0.0.0.0/0"
-  ip_version     = "ipv4"
+
   group =  ibm_is_security_group.ssh_security_group.id
   depends_on = [ibm_is_security_group.ssh_security_group]
 }
@@ -97,11 +97,12 @@ resource "ibm_is_instance" "vm_db" {
   image             = "r018-941eb02e-ceb9-44c8-895b-b31d241f43b5" 
   profile           = "bx2-2x8"
   resource_group = var.resource_group_id
-  keys = [ ibm_is_ssh_key.ssh_key.id ]
+  
 
     primary_network_interface {
     subnet            = ibm_is_subnet.subnet_vm.id
     allow_ip_spoofing = true
+    security_groups   = [ibm_is_security_group.ssh_security_group.id]
 
     primary_ip {
       auto_delete = false
@@ -109,6 +110,7 @@ resource "ibm_is_instance" "vm_db" {
     }
   }
 
+  keys = [ ibm_is_ssh_key.ssh_key.id ]
   depends_on = [ibm_is_subnet.subnet_vm, ibm_is_security_group.ssh_security_group]
 
 }
