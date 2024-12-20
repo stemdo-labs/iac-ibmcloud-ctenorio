@@ -1,0 +1,42 @@
+name: Ansible
+
+on:
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  ansible:
+    name: Run Ansible Playbook
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+          sudo apt install sshpass -y
+
+      - name: Install ansible-galaxy role
+        run: |
+          ansible-galaxy role install geerlingguy.postgresql --force
+        
+      - name: Create inventory.ini file
+        run: |
+          echo "[postgresql_servers]" > inventory.ini
+          echo "root@${{ secrets.IP_PUBLICA }}" >> inventory.ini
+        working-directory: ./ansible
+
+      - name: Execute playbook
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory.ini install-postgresql.yaml
+        env:
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          PGPASSWORD: ${{ secrets.PGPASSWORD }}
+        working-directory: ./ansible
