@@ -18,3 +18,9 @@ variable "zone" {
   type        = string
 }
 
+variable "public_ssh_key" {
+  description = "ssh key"
+  type        = string
+}
+
+
