@@ -21,16 +21,14 @@ resource "ibm_is_vpc" "vpc" {
 
 }
 
-# resource "ibm_is_vpc" "vpc_cluster" {
-#   name              = "vpc-cluster-ctenorio"
-#   resource_group    = var.resource_group_id
-# }
+
 
 resource "ibm_is_ssh_key" "ssh_key" {
   name       = "ssh-key-ctenorio"
   public_key = var.public_ssh_key
   type       = "rsa"
   resource_group = var.resource_group_id
+  depends_on = [ibm_is_vpc.vpc]
 }
 
 
@@ -42,6 +40,7 @@ resource "ibm_is_subnet" "subnet_vm" {
   vpc               = ibm_is_vpc.vpc.id
   zone              = var.zone
   resource_group    = var.resource_group_id
+  depends_on = [ibm_is_vpc.vpc]
 }
 
 # Subnet cluster
@@ -58,12 +57,14 @@ resource "ibm_is_floating_ip" "public_ip_db" {
   name   = "public-ip-db"
   target = ibm_is_instance.vm_db.primary_network_interface[0].id
   resource_group = var.resource_group_id
+  depends_on = [ibm_is_instance.vm_db]
 }
 
 resource "ibm_is_security_group" "ssh_security_group" {
   name   = "ssh-security-group-cntenorio"
   vpc    = ibm_is_vpc.vpc.id
   resource_group = var.resource_group_id
+  depends_on = [ibm_is_vpc.vpc]
 }
  
 # Crear una regla para habilitar el puerto 22 (SSH)
@@ -76,6 +77,8 @@ resource "ibm_is_security_group_rule" "allow_ssh" {
   port_min       = 22
   port_max       = 22
   }
+
+  depends_on = [ibm_is_security_group.ssh_security_group]
   
 }
 resource "ibm_is_security_group_rule" "allow_outbound" {
@@ -83,6 +86,7 @@ resource "ibm_is_security_group_rule" "allow_outbound" {
   remote         = "0.0.0.0/0"
   ip_version     = "ipv4"
   group =  ibm_is_security_group.ssh_security_group.id
+  depends_on = [ibm_is_security_group.ssh_security_group]
 }
 
 # Máquina Virtual (VM) para la base de datos
@@ -105,6 +109,8 @@ resource "ibm_is_instance" "vm_db" {
     }
   }
 
+  depends_on = [ibm_is_subnet.subnet_vm, ibm_is_security_group.ssh_security_group]
+
 }
 
 # IBM Container Registry (ICR)
@@ -121,18 +127,3 @@ resource "ibm_resource_instance" "cos_instance" {
   resource_group_id = var.resource_group_id
 }
 
-# # Clúster de Kubernetes (VPC)
-# resource "ibm_container_vpc_cluster" "cluster" {
-#   name              = "cntenorio-vpc-cluster"
-#   vpc_id            = ibm_is_vpc.vpc_cluster.id
-#   kube_version      = "4.16.23_openshift"
-#   flavor            = "bx2.4x16"
-#   worker_count      = "2"
-#   cos_instance_crn  = ibm_resource_instance.cos_instance.id
-#   resource_group_id = var.resource_group_id
-
-#   zones {
-#     subnet_id = ibm_is_subnet.subnet_cluster.id
-#     name      = var.zone
-#   }
-# }
