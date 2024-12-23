@@ -63,17 +63,8 @@
       become_user: root
       lineinfile:
         path: "/etc/postgresql/16/main/pg_hba.conf"
-        regexp: '^host\s+all\s+all\s+0.0.0.0/0\s+md5'
-        line: "host    all             all             0.0.0.0/0               md5"
-        state: present
-
-    - name: Configurar acceso en pg_hba.conf para myuser y la base de datos rrhh
-      become: yes
-      become_user: root
-      lineinfile:
-        path: "/etc/postgresql/16/main/pg_hba.conf"
-        regexp: '^host\s+rrhh\s+myuser\s+127\.0\.0\.1/32\s+md5'
-        line: "host    rrhh            myuser          127.0.0.1/32            md5"
+        regexp: '^host\s+all\s+myuser\s+10.0.1.4/32\s+md5'
+        line: "host    all             myuser        0.0.0.0/0               md5"
         state: present
   
     - name: Reiniciar PostgreSQL 16
