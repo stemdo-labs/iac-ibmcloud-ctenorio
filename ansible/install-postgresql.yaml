@@ -22,7 +22,6 @@
         password: "{{ lookup('env', 'PGPASSWORD') }}"
         encrypted: yes
         state: present
-    postgresql_python_library: ""
     
   roles:
     - geerlingguy.postgresql
