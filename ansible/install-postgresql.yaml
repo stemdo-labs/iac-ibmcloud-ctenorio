@@ -76,7 +76,7 @@
         line: "host    rrhh            myuser          127.0.0.1/32            md5"
         state: present
   
-      - name: Reiniciar PostgreSQL 16
-        service:
-          name: postgresql
-          state: restarted
+    - name: Reiniciar PostgreSQL 16
+      service:
+        name: postgresql
+        state: restarted
