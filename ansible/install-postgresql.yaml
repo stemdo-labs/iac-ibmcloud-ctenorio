@@ -1,7 +1,7 @@
 - hosts: postgresql_servers
   become: yes
   vars:
-    postgresql_version: "14"
+    postgresql_version: "16"
     postgresql_hba_entries:
       - { type: local, database: all, user: postgres, auth_method: md5 }
       - { type: local, database: all, user: all, auth_method: md5 }
