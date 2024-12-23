@@ -38,7 +38,7 @@ jobs:
       - name: Create inventory.ini file
         run: |
           echo "[postgresql_servers]" > inventory.ini
-          echo "ansible_host=${{ secrets.IP_PUBLICA }} ansible_user=root ansible_ssh_private_key_file=~/.ssh/id_rsa" >> inventory.ini
+          echo "${{ secrets.IP_PUBLICA }} ansible_user=root ansible_ssh_private_key_file=~/.ssh/id_rsa" >> inventory.ini
         working-directory: ./ansible
 
 
