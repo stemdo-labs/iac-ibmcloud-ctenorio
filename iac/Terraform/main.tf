@@ -22,7 +22,7 @@ resource "ibm_is_vpc" "vpc" {
 }
 
 
-
+# SSH Key
 resource "ibm_is_ssh_key" "ssh_key" {
   name       = "ssh-key-ctenorio"
   public_key = var.public_ssh_key
@@ -73,9 +73,10 @@ resource "ibm_is_security_group_rule" "allow_ssh" {
   remote         = "0.0.0.0/0"
 
   group =  ibm_is_security_group.ssh_security_group.id
+  
   tcp {
-  port_min       = 22
-  port_max       = 22
+    port_min       = 22
+    port_max       = 22
   }
 
   depends_on = [ibm_is_security_group.ssh_security_group]
@@ -86,6 +87,7 @@ resource "ibm_is_security_group_rule" "allow_outbound" {
   remote         = "0.0.0.0/0"
 
   group =  ibm_is_security_group.ssh_security_group.id
+  
   depends_on = [ibm_is_security_group.ssh_security_group]
 }
 
