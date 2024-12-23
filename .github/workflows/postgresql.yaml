@@ -31,10 +31,6 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         
-          
-      - name: Install ansible-galaxy role
-        run: |
-          ansible-galaxy role install geerlingguy.postgresql --force
         
       - name: Create inventory.ini file
         run: |
