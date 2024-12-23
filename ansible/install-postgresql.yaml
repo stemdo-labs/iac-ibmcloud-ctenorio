@@ -6,6 +6,7 @@
       - postgresql-16
       - postgresql-client-16
       - postgresql-contrib-16
+    postgresql_python_library: python3-psycopg2
     postgresql_hba_entries:
       - { type: local, database: all, user: postgres, auth_method: md5 }
       - { type: local, database: all, user: all, auth_method: md5 }
@@ -26,11 +27,11 @@
         password: "{{ lookup('env', 'PGPASSWORD') }}"
         encrypted: yes
         state: present
-    
+
   pre_tasks:
     - name: Add PostgreSQL APT repository
       apt_repository:
-        repo: "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main"
+        repo: "deb http://apt.postgresql.org/pub/repos/apt {{ ansible_facts['os_distribution_release'] }}-pgdg main"
         state: present
 
     - name: Import PostgreSQL signing key
