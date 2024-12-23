@@ -39,6 +39,12 @@ jobs:
 
         working-directory: ./ansible
 
+      - name: Crear archivo de variables
+        run: |
+          echo "postgres_db: ${{ secrets.DB_NAME }}" > variables.yaml
+          echo "postgres_user: ${{ secrets.DB_USER }}" >> variables.yaml
+          echo "postgres_password: ${{ secrets.PGPASSWORD }}" >> variables.yaml
+        working-directory: ./ansible
 
       - name: Execute playbook
         run: |
