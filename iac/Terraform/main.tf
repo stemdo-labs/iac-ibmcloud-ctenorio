@@ -43,15 +43,6 @@ resource "ibm_is_subnet" "subnet_vm" {
   depends_on = [ibm_is_vpc.vpc]
 }
 
-# Subnet cluster
-# resource "ibm_is_subnet" "subnet_cluster" {
-#   name              = "subnet-cluster"
-#   ipv4_cidr_block   = "10.242.1.0/24"
-#   vpc               = ibm_is_vpc.vpc_cluster.id
-#   zone              = var.zone
-#   resource_group    = var.resource_group_id
-# }
-
 # Public IP
 resource "ibm_is_floating_ip" "public_ip_db" {
   name   = "public-ip-db"
@@ -87,7 +78,7 @@ resource "ibm_is_security_group_rule" "allow_outbound" {
   remote         = "0.0.0.0/0"
 
   group =  ibm_is_security_group.ssh_security_group.id
-  
+
   depends_on = [ibm_is_security_group.ssh_security_group]
 }
 
