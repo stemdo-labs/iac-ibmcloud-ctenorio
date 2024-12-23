@@ -1,57 +1,41 @@
-- hosts: postgresql_servers
-  become: yes
+- name: Configuración e instalación de PostgreSQL
+  hosts: postgresql_servers
+  become: true
+
   vars:
-    postgresql_version: "16"
-    postgresql_packages:
-      - postgresql-16
-      - postgresql-client-16
-      - postgresql-contrib-16
-    postgresql_python_library: python3-psycopg2
-    postgresql_hba_entries:
-      - { type: local, database: all, user: postgres, auth_method: md5 }
-      - { type: local, database: all, user: all, auth_method: md5 }
-      - { type: host, database: all, user: "{{ lookup('env', 'DB_USER') }}", address: '127.0.0.1/32', auth_method: md5 }
-      - { type: host, database: all, user: "{{ lookup('env', 'DB_USER') }}", address: '::1/128', auth_method: md5 }
-      - { type: host, database: "{{ lookup('env', 'DB_NAME') }}", user: "{{ lookup('env', 'DB_USER') }}", address: '192.168.1.0/24', auth_method: md5 }
-      - { type: host, database: all, user: all, address: '0.0.0.0/0', auth_method: md5 }
-    postgresql_global_config_options:
-      - option: listen_addresses
-        value: '*'
-      - option: log_directory
-        value: '/var/log/postgresql'
-    postgresql_databases:
-      - name: "{{ lookup('env', 'DB_NAME') }}"
-        state: present
-    postgresql_users:
-      - name: "{{ lookup('env', 'DB_USER') }}"
-        password: "{{ lookup('env', 'PGPASSWORD') }}"
-        encrypted: yes
-        state: present
+    postgres_db: "{{ lookup('env', 'POSTGRES_DB') }}"
+    postgres_user: "{{ lookup('env', 'POSTGRES_USER') }}"
+    postgres_password: "{{ lookup('env', 'POSTGRES_PASSWORD') }}"
 
-  pre_tasks:
-    - name: Gather facts
-      ansible.builtin.setup:
-
-    - name: Add PostgreSQL APT repository
+  tasks:
+    - name: Agregar el repositorio oficial de PostgreSQL 16
       apt_repository:
-        repo: "deb http://apt.postgresql.org/pub/repos/apt {{ ansible_facts['distribution_release'] }}-pgdg main"
+        repo: "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main"
         state: present
+        filename: "pgdg"
 
-    - name: Import PostgreSQL signing key
+    - name: Importar la clave GPG del repositorio de PostgreSQL
       apt_key:
         url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
         state: present
 
-    - name: Update apt cache
+    - name: Actualizar el repositorio de paquetes
       apt:
         update_cache: yes
 
-    - name: Ensure Python libraries are installed
+    - name: Instalar PostgreSQL 16 y los paquetes necesarios
       apt:
         name:
+          - postgresql-16
+          - postgresql-client-16
           - python3-psycopg2
-          - libpq-dev
         state: present
 
-  roles:
-    - geerlingguy.postgresql
+    - name: Asegurarse de que PostgreSQL 16 está en ejecución
+      service:
+        name: postgresql
+        state: started
+        enabled: true
+
+    - name: Crear una base de datos
+      become_user: post
