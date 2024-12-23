@@ -22,6 +22,14 @@
         password: "{{ lookup('env', 'PGPASSWORD') }}"
         encrypted: yes
         state: present
+    postgresql_python_library: ""
+
+    pre_tasks:
+    - name: Install Python PostgreSQL library with pip
+      become: yes
+      ansible.builtin.shell: |
+        pip3 install psycopg2-binary
+    
   roles:
     - geerlingguy.postgresql
 
