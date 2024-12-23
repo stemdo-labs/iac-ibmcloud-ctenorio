@@ -2,10 +2,8 @@
   hosts: postgresql_servers
   become: true
 
-  vars:
-    postgres_db: "{{ lookup('env', 'POSTGRES_DB') }}"
-    postgres_user: "{{ lookup('env', 'POSTGRES_USER') }}"
-    postgres_password: "{{ lookup('env', 'POSTGRES_PASSWORD') }}"
+  vars_files:
+    - variables.yaml
 
   tasks:
     - name: Actualizar el repositorio de paquetes
