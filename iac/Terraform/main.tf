@@ -36,7 +36,7 @@ resource "ibm_is_ssh_key" "ssh_key" {
 # # Subnet vm
 # resource "ibm_is_subnet" "subnet_vm" {
 #   name              = "subnet-vm"
-#   ipv4_cidr_block   = "10.242.0.0/24"
+#   ipv4_cidr_block   = "10.251.2.0/24"
 #   vpc               = var.vpc_cluster_id
 #   zone              = var.zone
 #   resource_group    = var.resource_group_id
@@ -116,7 +116,7 @@ resource "ibm_is_instance" "vm_db" {
 
     primary_ip {
       auto_delete = false
-      address     = "10.242.0.4"
+      address     = "10.251.2.6"
     }
   }
 
