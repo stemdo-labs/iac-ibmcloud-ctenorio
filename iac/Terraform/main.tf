@@ -33,15 +33,15 @@ resource "ibm_is_ssh_key" "ssh_key" {
 
 
 
-# # Subnet vm
-# resource "ibm_is_subnet" "subnet_vm" {
-#   name              = "subnet-vm"
-#   ipv4_cidr_block   = "10.251.2.0/24"
-#   vpc               = var.vpc_cluster_id
-#   zone              = var.zone
-#   resource_group    = var.resource_group_id
-#   depends_on = [ibm_is_vpc.vpc]
-# }
+ # Subnet vm
+resource "ibm_is_subnet" "subnet_vm" {
+   name              = "subnet-vm"
+   ipv4_cidr_block   = "10.251.2.0/24"
+   vpc               = var.vpc_cluster_id
+   zone              = var.zone
+   resource_group    = var.resource_group_id
+   depends_on = [ibm_is_vpc.vpc]
+}
 
 # # Public IP
 # resource "ibm_is_floating_ip" "public_ip_db" {
