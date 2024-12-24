@@ -75,7 +75,7 @@ resource "ibm_is_security_group_rule" "allow_ssh" {
 }
 
 # Crear una regla para habilitar el ping
-resource "ibm_is_security_group_rule" "allow_ssh" {
+resource "ibm_is_security_group_rule" "allow_ping" {
   direction      = "inbound"
   remote         = "0.0.0.0/0"
 
