@@ -35,7 +35,7 @@ resource "ibm_is_ssh_key" "ssh_key" {
 
  # Subnet vm
 resource "ibm_is_subnet" "subnet_vm" {
-   name              = "subnet-vm"
+   name              = "subnet-vm-ctenorio"
    ipv4_cidr_block   = "10.251.2.0/24"
    vpc               = var.vpc_cluster_id
    zone              = var.zone
@@ -101,7 +101,7 @@ resource "ibm_is_security_group_rule" "allow_outbound" {
 
 # Máquina Virtual (VM) para la base de datos
 resource "ibm_is_instance" "vm_db" {
-  name              = "vmdb"
+  name              = "vmdb-ctenorio"
   vpc               = var.vpc_cluster_id
   zone              = var.zone
   image             = "r050-8bddef68-ebaf-481f-a87e-a526f159b192" 
