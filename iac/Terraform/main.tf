@@ -15,11 +15,11 @@ provider "ibm" {
 }
 
 # Virtual Private Cloud (VPC)
-resource "ibm_is_vpc" "vpc" {
-  name              = "vpc-vm-ctenorio"
-  resource_group    = var.resource_group_id
+# resource "ibm_is_vpc" "vpc" {
+#   name              = "vpc-vm-ctenorio"
+#   resource_group    = var.resource_group_id
 
-}
+# }
 
 
 # SSH Key
@@ -33,27 +33,27 @@ resource "ibm_is_ssh_key" "ssh_key" {
 
 
 
-# Subnet vm
-resource "ibm_is_subnet" "subnet_vm" {
-  name              = "subnet-vm"
-  ipv4_cidr_block   = "10.242.0.0/24"
-  vpc               = ibm_is_vpc.vpc.id
-  zone              = var.zone
-  resource_group    = var.resource_group_id
-  depends_on = [ibm_is_vpc.vpc]
-}
+# # Subnet vm
+# resource "ibm_is_subnet" "subnet_vm" {
+#   name              = "subnet-vm"
+#   ipv4_cidr_block   = "10.242.0.0/24"
+#   vpc               = var.vpc_cluster_id
+#   zone              = var.zone
+#   resource_group    = var.resource_group_id
+#   depends_on = [ibm_is_vpc.vpc]
+# }
 
-# Public IP
-resource "ibm_is_floating_ip" "public_ip_db" {
-  name   = "public-ip-db"
-  target = ibm_is_instance.vm_db.primary_network_interface[0].id
-  resource_group = var.resource_group_id
-  depends_on = [ibm_is_instance.vm_db]
-}
+# # Public IP
+# resource "ibm_is_floating_ip" "public_ip_db" {
+#   name   = "public-ip-db"
+#   target = ibm_is_instance.vm_db.primary_network_interface[0].id
+#   resource_group = var.resource_group_id
+#   depends_on = [ibm_is_instance.vm_db]
+# }
 
 resource "ibm_is_security_group" "ssh_security_group" {
   name   = "ssh-security-group-cntenorio"
-  vpc    = ibm_is_vpc.vpc.id
+  vpc    = var.vpc_cluster_id
   resource_group = var.resource_group_id
   depends_on = [ibm_is_vpc.vpc]
 }
@@ -73,6 +73,23 @@ resource "ibm_is_security_group_rule" "allow_ssh" {
   depends_on = [ibm_is_security_group.ssh_security_group]
   
 }
+
+# Crear una regla para habilitar el ping
+resource "ibm_is_security_group_rule" "allow_ssh" {
+  direction      = "inbound"
+  remote         = "0.0.0.0/0"
+
+  group =  ibm_is_security_group.ssh_security_group.id
+  
+  icmp {
+      code = 0
+      type = 8
+  }
+
+  depends_on = [ibm_is_security_group.ssh_security_group]
+  
+}
+
 resource "ibm_is_security_group_rule" "allow_outbound" {
   direction      = "outbound"
   remote         = "0.0.0.0/0"
@@ -85,9 +102,9 @@ resource "ibm_is_security_group_rule" "allow_outbound" {
 # Máquina Virtual (VM) para la base de datos
 resource "ibm_is_instance" "vm_db" {
   name              = "vmdb"
-  vpc               = ibm_is_vpc.vpc.id
+  vpc               = var.vpc_cluster_id
   zone              = var.zone
-  image             = "r018-941eb02e-ceb9-44c8-895b-b31d241f43b5" 
+  image             = "r050-8bddef68-ebaf-481f-a87e-a526f159b192" 
   profile           = "bx2-2x8"
   resource_group = var.resource_group_id
   

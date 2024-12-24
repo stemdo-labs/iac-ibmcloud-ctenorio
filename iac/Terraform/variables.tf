@@ -11,16 +11,25 @@ variable "resource_group_id" {
 variable "region" {
   description = "Region"
   type        = string
+  default = "eu-es"
 }
 
 variable "zone" {
   description = "Zona"
   type        = string
+    default = "eu-es-1"
 }
 
 variable "public_ssh_key" {
   description = "ssh key"
   type        = string
 }
+
+variable "vpc_cluster_id" {
+  description = "VPC cluster id"
+  type        = string
+  default = "r050-4368bf72-fe4a-4fb0-a7ff-baccf91a74a4"
+}
+
 
 
