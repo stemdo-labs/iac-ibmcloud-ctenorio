@@ -28,7 +28,7 @@ resource "ibm_is_ssh_key" "ssh_key" {
   public_key = var.public_ssh_key
   type       = "rsa"
   resource_group = var.resource_group_id
-  depends_on = [ibm_is_vpc.vpc]
+  #depends_on = [ibm_is_vpc.vpc]
 }
 
 
@@ -40,7 +40,7 @@ resource "ibm_is_subnet" "subnet_vm" {
    vpc               = var.vpc_cluster_id
    zone              = var.zone
    resource_group    = var.resource_group_id
-   depends_on = [ibm_is_vpc.vpc]
+  # depends_on = [ibm_is_vpc.vpc]
 }
 
 # # Public IP
@@ -55,7 +55,7 @@ resource "ibm_is_security_group" "ssh_security_group" {
   name   = "ssh-security-group-cntenorio"
   vpc    = var.vpc_cluster_id
   resource_group = var.resource_group_id
-  depends_on = [ibm_is_vpc.vpc]
+  #depends_on = [ibm_is_vpc.vpc]
 }
  
 # Crear una regla para habilitar el puerto 22 (SSH)
