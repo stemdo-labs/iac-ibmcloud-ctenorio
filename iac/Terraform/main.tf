@@ -31,13 +31,6 @@ resource "ibm_is_ssh_key" "ssh_key" {
   #depends_on = [ibm_is_vpc.vpc]
 }
 
-# Crear un Public Gateway
-resource "ibm_is_public_gateway" "public_gateway" {
-  name            = "public-gateway-cntenorio"
-  vpc             = var.vpc_cluster_id
-  zone            = var.zone
-  resource_group  = var.resource_group_id
-}
 
  # Subnet vm
 resource "ibm_is_subnet" "subnet_vm" {
@@ -46,8 +39,6 @@ resource "ibm_is_subnet" "subnet_vm" {
    vpc               = var.vpc_cluster_id
    zone              = var.zone
    resource_group    = var.resource_group_id
-   public_gateway  = ibm_is_public_gateway.public_gateway.id
-   depends_on = [ibm_is_public_gateway.public_gateway]
 }
 
 # # Public IP
