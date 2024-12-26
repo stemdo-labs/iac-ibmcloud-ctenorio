@@ -22,13 +22,17 @@ jobs:
         run: |
           curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
 
+      - name: Install IBM Cloud Container Registry Plugin
+        run: |
+          ibmcloud plugin install container-registry
+
       - name: Debug IBM Cloud Login Inputs
         run: |
           echo "API Key: ${{ secrets.IBM_CLOUD_API_KEY }}"
 
       - name: Login to IBM Cloud
         run: |
-          ibmcloud login --apikey ${{ secrets.IBM_CLOUD_API_KEY }} 
+          ibmcloud login --apikey ${{ secrets.IBM_CLOUD_API_KEY }}
 
       - name: Configurar IBM Cloud Container Registry
         run: |
