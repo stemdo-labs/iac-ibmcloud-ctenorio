@@ -120,18 +120,18 @@ resource "ibm_is_instance" "vm_db" {
 
   #keys = [ ibm_is_ssh_key.ssh_key.id ]
 
-    connection {
-      type = "ssh"
-      host = var.bastion_public_ip
-      user = "root"
-  }
+   #   connection {
+  #     type = "ssh"
+  #     host = var.bastion_public_ip
+  #     user = "root"
+  # }
 
-  provisioner "remote-exec" {
-    inline = [
-      "ssh-keygen -t rsa -b 4096 -f /root/.ssh/generated_key -N ''",
-      "cat /root/.ssh/generated_key.pub > /tmp/generated_key.pub"
-    ]
-  }
+  # provisioner "remote-exec" {
+  #   inline = [
+  #     "ssh-keygen -t rsa -b 4096 -f /root/.ssh/generated_key -N ''",
+  #     "cat /root/.ssh/generated_key.pub > /tmp/generated_key.pub"
+  #   ]
+  # }
 
   depends_on = [ibm_is_subnet.subnet_vm, ibm_is_security_group.ssh_security_group]
 
