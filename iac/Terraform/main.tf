@@ -36,7 +36,7 @@ resource "ibm_is_public_gateway" "public_gateway" {
   name            = "public-gateway-cntenorio"
   vpc             = var.vpc_cluster_id
   zone            = var.zone
-  resource_group  = var.rg-name
+  resource_group  = var.resource_group_id
 }
 
  # Subnet vm
