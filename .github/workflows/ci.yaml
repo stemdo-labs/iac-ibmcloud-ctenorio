@@ -28,7 +28,7 @@ jobs:
 
       - name: Login to IBM Cloud
         run: |
-          ibmcloud login --apikey ${{ secrets.IBM_CLOUD_API_KEY }} -r us-south
+          ibmcloud login --apikey ${{ secrets.IBM_CLOUD_API_KEY }} 
 
       - name: Configurar IBM Cloud Container Registry
         run: |
