@@ -33,7 +33,7 @@ resource "ibm_is_ssh_key" "ssh_key" {
 
 # Crear un Public Gateway
 resource "ibm_is_public_gateway" "public_gateway" {
-  name            = "public-gateway-vsanchez"
+  name            = "public-gateway-cntenorio"
   vpc             = var.vpc_cluster_id
   zone            = var.zone
   resource_group  = var.rg-name
