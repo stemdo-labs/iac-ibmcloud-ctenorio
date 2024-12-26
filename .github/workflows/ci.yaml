@@ -1,0 +1,41 @@
+name: Reusable CI Workflow
+
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar código del repositorio
+        uses: actions/checkout@v3
+
+      - name: Install IBM Cloud CLI
+        run: |
+          curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+
+      - name: Debug IBM Cloud Login Inputs
+        run: |
+          echo "API Key: ${{ secrets.IBM_CLOUD_API_KEY }}"
+
+      - name: Login to IBM Cloud
+        run: |
+          ibmcloud login --apikey ${{ secrets.IBM_CLOUD_API_KEY }} -r us-south
+
+      - name: Configurar IBM Cloud Container Registry
+        run: |
+          ibmcloud cr login
+          ibmcloud cr namespace-add ctenorio-cr
+
+      - name: Construir y Publicar la Imagen Docker
+        run: |
+          docker build -t us.icr.io/ctenorio-cr/${{ inputs.image_name }}:${{ inputs.version }} .
+          docker push us.icr.io/ctenorio-cr/${{ inputs.image_name }}:${{ inputs.version }}
