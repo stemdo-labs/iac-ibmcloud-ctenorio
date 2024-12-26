@@ -143,11 +143,11 @@ resource "ibm_cr_namespace" "rg_namespace" {
   resource_group_id = var.resource_group_id
 }
 
-resource "ibm_resource_instance" "cos_instance" {
-  name     = "os_instance"
-  service  = "cloud-object-storage"
-  plan     = "standard"
-  location = "global"
-  resource_group_id = var.resource_group_id
-}
+# resource "ibm_resource_instance" "cos_instance" {
+#   name     = "os_instance"
+#   service  = "cloud-object-storage"
+#   plan     = "standard"
+#   location = "global"
+#   resource_group_id = var.resource_group_id
+# }
 
