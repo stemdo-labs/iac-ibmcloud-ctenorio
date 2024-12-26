@@ -31,5 +31,10 @@ variable "vpc_cluster_id" {
   default = "r050-4368bf72-fe4a-4fb0-a7ff-baccf91a74a4"
 }
 
+variable "bastion_public_ip" {
+  description = "IP pública del bastion host (clúster)"
+  type        = string
+}
+
 
 
