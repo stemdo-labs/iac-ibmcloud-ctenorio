@@ -32,7 +32,7 @@ jobs:
 
       - name: Login to IBM Cloud
         run: |
-          ibmcloud login --apikey ${{ secrets.IBM_CLOUD_API_KEY }} --no-region
+          ibmcloud login --apikey ${{ secrets.IBM_CLOUD_API_KEY }} -r eu-gb
 
       - name: Target Resource Group
         run: |
