@@ -35,5 +35,6 @@ jobs:
 
     - name: Push Helm Chart to Harbor
       run: |
-        helm push ${{ github.event.inputs.chart }}.tgz oci://uk.icr.io/ctenorio-cr
+        CHART_FILE=$(ls ./charts/${{ github.event.inputs.chart }}-*.tgz)
+        helm push $CHART_FILE oci://uk.icr.io/ctenorio-cr
       working-directory: ./charts
