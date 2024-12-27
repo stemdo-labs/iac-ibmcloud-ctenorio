@@ -24,14 +24,6 @@ jobs:
       run: |
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-    # - name: Login to Harbor
-    #   env:
-    #     HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
-    #     HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
-    #     HARBOR_IP: ${{ secrets.HARBOR_IP }}
-    #   run: |
-    #     helm registry login $HARBOR_IP --username $HARBOR_USERNAME --password $HARBOR_PASSWORD
-
     - name: Obtener versión
       id: version
       uses: ./.github/actions/version
@@ -48,9 +40,7 @@ jobs:
         helm package ${{ github.event.inputs.chart }} --version ${{ steps.version.outputs.version }}
       working-directory: ./charts
 
-    # - name: Push Helm Charts to Harbor
-    #   env:
-    #     HARBOR_IP: ${{ secrets.HARBOR_IP }}
-    #   run: |
-    #       helm push ${{ github.event.inputs.chart }}-${{ steps.version.outputs.version }}.tgz oci://$HARBOR_IP/ctenorio
-    #   working-directory: ./charts
+    - name: Push Helm Charts to Harbor
+      run: |
+           helm push ${{ github.event.inputs.chart }}-${{ steps.version.outputs.version }}.tgz oci://uk.icr.io/ctenorio-cr
+      working-directory: ./charts
