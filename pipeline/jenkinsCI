@@ -18,7 +18,7 @@ pipeline {
         }
         stage('Instalar IBM Cloud CLI') {
             steps {
-                sh 'curl -fsSL https://clis.cloud.ibm.com/install/linux | sudo sh'
+                sh 'curl -fsSL https://clis.cloud.ibm.com/install/linux | sh'
             }
         }
         stage('Verificar IBM Cloud CLI') {
