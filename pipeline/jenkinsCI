@@ -28,8 +28,6 @@ pipeline {
             }
         }
 
-
-/*
        
         stage('Instalar IBM Cloud Container Registry Plugin') {
             steps {
@@ -63,8 +61,7 @@ pipeline {
         }
 
 
-      #DOCKER
-    stage('Instalar Docker') {
+        stage('Instalar Docker') {
             steps {
                 script {
                     sh '''
@@ -98,6 +95,5 @@ pipeline {
                 }
             }
         }
-        */
     }
 }
