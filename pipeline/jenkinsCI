@@ -3,72 +3,67 @@ pipeline {
         kubernetes {
             label 'jenkins-jenkins-agent'
             defaultContainer 'jnlp'
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: jnlp
+    image: jenkins/inbound-agent
+    volumeMounts:
+    - name: docker-socket
+      mountPath: /var/run/docker.sock
+  - name: docker
+    image: docker:20.10.21
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+    - name: docker-socket
+      mountPath: /var/run/docker.sock
+  volumes:
+  - name: docker-socket
+    hostPath:
+      path: /var/run/docker.sock
+      type: Socket
+"""
         }
     }
     parameters {
-        // Definir los parámetros equivalentes a inputs en GitHub Actions
         string(name: 'IMAGE_NAME', description: 'Nombre de la imagen Docker', defaultValue: 'prueba')
         string(name: 'VERSION', description: 'Versión de la imagen Docker', defaultValue: '1')
     }
     environment {
-        // Definir variables de entorno
         IBM_CLOUD_API_KEY = credentials('IBM_CLOUD_API_KEY')
     }
     stages {
         stage('Descargar Código del Repositorio') {
             steps {
-                // Checkout del código fuente
                 checkout scm
             }
         }
-        stage('Instalar Docker') {
+        stage('Verificar Docker') {
             steps {
-                script {
-                    sh '''
-                        # Add Docker's official GPG key:
-                        apt-get update
-                        apt-get install -y ca-certificates curl
-                        install -m 0755 -d /etc/apt/keyrings
-                        curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-                        chmod a+r /etc/apt/keyrings/docker.asc
- 
-                        # Add the repository to Apt sources:
-                        echo \
-                            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
-                            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-                            tee /etc/apt/sources.list.d/docker.list > /dev/null
-                        apt-get update
- 
-                        apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-                    '''
-                }
+                sh 'docker --version'
             }
         }
-    
         stage('Instalar IBM Cloud CLI') {
             steps {
                 sh 'curl -fsSL https://clis.cloud.ibm.com/install/linux | sh'
-                }
             }
-
+        }
         stage('Verificar IBM Cloud CLI') {
             steps {
                 sh 'ibmcloud --version'
             }
         }
-
         stage('Instalar IBM Cloud Container Registry Plugin') {
             steps {
                 sh 'ibmcloud plugin install container-registry'
             }
         }
-        stage('Debug IBM Cloud Login Inputs') {
-            steps {
-                echo "API Key: ${env.IBM_CLOUD_API_KEY}" 
-            }
-        }
         stage('Login to IBM Cloud') {
-             steps {
+            steps {
                 withCredentials([string(credentialsId: 'IBM_CLOUD_API_KEY', variable: 'API_KEY')]) {
                     sh 'ibmcloud login --apikey ${API_KEY} -r eu-gb'
                 }
@@ -81,25 +76,18 @@ pipeline {
         }
         stage('Configurar IBM Cloud Container Registry') {
             steps {
-                script {
-                    sh '''
-                    ibmcloud cr login
-                    ibmcloud cr namespace-add ctenorio-cr
-                    '''
-                }
+                sh '''
+                ibmcloud cr login
+                ibmcloud cr namespace-add ctenorio-cr
+                '''
             }
         }
-
-       
-
         stage('Construir y Publicar la Imagen Docker') {
             steps {
-                script {
-                    sh """
-                    docker build -t uk.icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION} .
-                    docker push uk.icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION}
-                    """
-                }
+                sh """
+                docker build -t uk.icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION} .
+                docker push uk.icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION}
+                """
             }
         }
     }
