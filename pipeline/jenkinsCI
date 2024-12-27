@@ -28,7 +28,7 @@ pipeline {
             }
         }
 
-       
+        /*
         stage('Instalar IBM Cloud Container Registry Plugin') {
             steps {
                 sh 'ibmcloud plugin install container-registry'
@@ -62,7 +62,7 @@ pipeline {
             }
         }
 
-
+       
         stage('Instalar Docker') {
             steps {
                 script {
@@ -96,6 +96,6 @@ pipeline {
                     """
                 }
             }
-        }
+        }*/
     }
 }
