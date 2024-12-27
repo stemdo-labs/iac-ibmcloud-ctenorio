@@ -1,0 +1,65 @@
+pipeline {
+    agent any
+    parameters {
+        // Definir los parámetros equivalentes a inputs en GitHub Actions
+        string(name: 'IMAGE_NAME', description: 'Nombre de la imagen Docker', defaultValue: 'prueba')
+        string(name: 'VERSION', description: 'Versión de la imagen Docker', defaultValue: '1')
+    }
+    environment {
+        // Definir variables de entorno
+        IBM_CLOUD_API_KEY = credentials('IBM_CLOUD_API_KEY')
+    }
+    stages {
+        stage('Descargar Código del Repositorio') {
+            steps {
+                // Checkout del código fuente
+                checkout scm
+            }
+        }
+        stage('Instalar IBM Cloud CLI') {
+            steps {
+                sh 'curl -fsSL https://clis.cloud.ibm.com/install/linux | sh'
+            }
+        }
+        stage('Instalar IBM Cloud Container Registry Plugin') {
+            steps {
+                sh 'ibmcloud plugin install container-registry'
+            }
+        }
+        stage('Debug IBM Cloud Login Inputs') {
+            steps {
+                echo "API Key: ${env.IBM_CLOUD_API_KEY}" 
+            }
+        }
+        stage('Login to IBM Cloud') {
+            steps {
+                sh 'ibmcloud login --apikey ${IBM_CLOUD_API_KEY} -r eu-gb'
+            }
+        }
+        stage('Target Resource Group') {
+            steps {
+                sh 'ibmcloud target -g Stemdo_Sandbox'
+            }
+        }
+        stage('Configurar IBM Cloud Container Registry') {
+            steps {
+                script {
+                    sh '''
+                    ibmcloud cr login
+                    ibmcloud cr namespace-add ctenorio-cr
+                    '''
+                }
+            }
+        }
+        stage('Construir y Publicar la Imagen Docker') {
+            steps {
+                script {
+                    sh """
+                    docker build -t uk.icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION} .
+                    docker push uk.icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION}
+                    """
+                }
+            }
+        }
+    }
+}
