@@ -1,0 +1,56 @@
+name: Empaquetar y subir el chart a Harbor
+
+on:
+  workflow_dispatch:
+      inputs:
+        chart:
+          description: "Selecciona el chart a empaquetar y subir"
+          required: true
+          type: choice
+          options:
+            - frontend
+            - backend
+          default: frontend
+
+jobs:
+  package-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install Helm
+      run: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+    - name: Login to Harbor
+      env:
+        HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+        HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
+        HARBOR_IP: ${{ secrets.HARBOR_IP }}
+      run: |
+        helm registry login $HARBOR_IP --username $HARBOR_USERNAME --password $HARBOR_PASSWORD
+
+    - name: Obtener versión
+      id: version
+      uses: ./.github/actions/version
+      with:
+        chart: ${{ github.event.inputs.chart }}
+
+    - name: Debug version output
+      run: |
+        echo "Versión obtenida: ${{ steps.version.outputs.version }}"
+
+
+    - name: Package Helm Charts
+      run: |
+        helm package ${{ github.event.inputs.chart }} --version ${{ steps.version.outputs.version }}
+      working-directory: ./charts
+
+    # - name: Push Helm Charts to Harbor
+    #   env:
+    #     HARBOR_IP: ${{ secrets.HARBOR_IP }}
+    #   run: |
+    #       helm push ${{ github.event.inputs.chart }}-${{ steps.version.outputs.version }}.tgz oci://$HARBOR_IP/ctenorio
+    #   working-directory: ./charts
