@@ -18,9 +18,28 @@ pipeline {
         }
         stage('Instalar IBM Cloud CLI') {
             steps {
-                sh 'curl -fsSL https://clis.cloud.ibm.com/install/linux | sh'
+                sh '''
+                # Descarga el archivo comprimido del CLI
+                curl -fsSL https://clis.cloud.ibm.com/download/bluemix-cli/1.3.2/IBM_Cloud_CLI_1.3.2_amd64.tar.gz -o ibmcloud.tar.gz
+                
+                # Extrae el contenido en el workspace
+                tar -xvf ibmcloud.tar.gz
+                
+                # Mueve el binario de ibmcloud al workspace
+                mv Bluemix_CLI/bin/ibmcloud $WORKSPACE/ibmcloud
+                
+                # Añade la ruta al PATH temporalmente para este job
+                export PATH=$WORKSPACE:$PATH
+                
+                # Verifica la instalación
+                $WORKSPACE/ibmcloud --version
+                
+                # Limpia los archivos descargados
+                rm -rf Bluemix_CLI ibmcloud.tar.gz
+                '''
+                }
             }
-        }
+
         stage('Verificar IBM Cloud CLI') {
             steps {
                 sh 'ibmcloud --version'
