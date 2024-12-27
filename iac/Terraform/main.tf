@@ -138,11 +138,10 @@ resource "ibm_is_instance" "vm_db" {
 }
 
 # IBM Container Registry (ICR)
-resource "ibm_cr_namespace" "rg_namespace" {
-  name              = "ctenorio-cr"
-  resource_group_id = var.resource_group_id
-  region = "eu-gb"
-}
+#resource "ibm_cr_namespace" "rg_namespace" {
+#  name              = "ctenorio-cr"
+#  resource_group_id = var.resource_group_id
+#}
 
 # resource "ibm_resource_instance" "cos_instance" {
 #   name     = "os_instance"
