@@ -2,15 +2,15 @@ name: Empaquetar y subir el chart a Harbor
 
 on:
   workflow_dispatch:
-      inputs:
-        chart:
-          description: "Selecciona el chart a empaquetar y subir"
-          required: true
-          type: choice
-          options:
-            - frontend
-            - backend
-          default: frontend
+    inputs:
+      chart:
+        description: "Selecciona el chart a empaquetar y subir"
+        required: true
+        type: choice
+        options:
+          - frontend
+          - backend
+        default: frontend
 
 jobs:
   package-and-push:
@@ -24,13 +24,16 @@ jobs:
       run: |
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-
-    - name: Package Helm Charts
+    - name: Package Helm Chart
       run: |
-        helm package ${{ github.event.inputs.chart }} 
+        helm package ${{ github.event.inputs.chart }}
       working-directory: ./charts
 
-    - name: Push Helm Charts to Harbor
+    - name: List packaged charts
       run: |
-           helm push ${{ github.event.inputs.chart }}.tgz oci://uk.icr.io/ctenorio-cr
+        ls -l ./charts
+
+    - name: Push Helm Chart to Harbor
+      run: |
+        helm push ${{ github.event.inputs.chart }}.tgz oci://uk.icr.io/ctenorio-cr
       working-directory: ./charts
