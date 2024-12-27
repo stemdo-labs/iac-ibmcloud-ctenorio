@@ -32,5 +32,5 @@ jobs:
 
     - name: Push Helm Charts to Harbor
       run: |
-           helm push ${{ github.event.inputs.chart }}-${{ steps.version.outputs.version }}.tgz oci://uk.icr.io/ctenorio-cr
+           helm push ${{ github.event.inputs.chart }}.tgz oci://uk.icr.io/ctenorio-cr
       working-directory: ./charts
