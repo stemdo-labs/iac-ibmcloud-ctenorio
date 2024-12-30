@@ -35,18 +35,15 @@ pipeline {
         }
     
     parameters {
-        // Definir los parámetros equivalentes a inputs en GitHub Actions
         string(name: 'IMAGE_NAME', description: 'Nombre de la imagen Docker', defaultValue: 'prueba')
         string(name: 'VERSION', description: 'Versión de la imagen Docker', defaultValue: '1')
     }
     environment {
-        // Definir variables de entorno
         IBM_CLOUD_API_KEY = credentials('IBM_CLOUD_API_KEY')
     }
     stages {
         stage('Descargar Código del Repositorio') {
             steps {
-                // Checkout del código fuente
                 checkout scm
             }
         }
