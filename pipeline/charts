@@ -94,7 +94,7 @@ pipeline {
             }
         }
 
-        stage('Push Helm Chart to Harbor') {
+        stage('Push Helm Chart to CR IBMCloud') {
             steps {
                 dir('charts') {
                     sh '''
