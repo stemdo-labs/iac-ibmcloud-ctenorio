@@ -27,7 +27,15 @@ jobs:
     - name: Authenticate with IBM Cloud Container Registry
       run: |
         ibmcloud login --apikey ${{ secrets.IBM_CLOUD_API_KEY }} -r eu-gb
-        ibmcloud ctenorio-cr login
+        
+    - name: Target Resource Group
+      run: |
+          ibmcloud target -g Stemdo_Sandbox
+
+    - name: Configurar IBM Cloud Container Registry
+      run: |
+          ibmcloud cr login
+          ibmcloud cr namespace-add ctenorio-cr
         
     - name: Install Helm
       run: |
