@@ -8,7 +8,7 @@ pipeline {
 
     parameters {
         choice(name: 'CHART',
-               choices: ['frontend', 'backend'],
+               choices: ['frontend-chart', 'backend-chart'],
                description: 'Selecciona el chart a empaquetar y subir')
     }
 
