@@ -3,6 +3,15 @@ pipeline {
         kubernetes {
             label 'jenkins-jenkins-agent'
             defaultContainer 'jnlp'
+            containers {
+                containerTemplate(
+                    name: 'docker',
+                    image: 'docker:24.0',
+                    command: 'cat',
+                    ttyEnabled: true,
+                    privileged: true
+                )
+            }
         }
     }
     parameters {
