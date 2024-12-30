@@ -67,12 +67,6 @@ pipeline {
                 }
             }
 
-        stage('Verificar IBM Cloud CLI') {
-            steps {
-                sh 'ibmcloud --version'
-            }
-        }
-
         stage('Instalar IBM Cloud Container Registry Plugin') {
             steps {
                 sh 'ibmcloud plugin install container-registry'
@@ -105,8 +99,6 @@ pipeline {
                 }
             }
         }
-
-       
 
         stage('Construir y Publicar la Imagen Docker') {
             steps {
