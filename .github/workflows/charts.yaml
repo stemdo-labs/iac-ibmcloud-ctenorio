@@ -1,5 +1,4 @@
-name: Empaquetar y subir el chart a Harbor
-
+name: Empaquetar y subir el chart
 on:
   workflow_dispatch:
     inputs:
