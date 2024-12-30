@@ -57,6 +57,7 @@ pipeline {
                 sh '''
                     apt-get update && \
                     apt-get install -y curl bash git docker.io
+                    dockerd > /var/log/dockerd.log 2>&1 &
                 '''
             }
         }
