@@ -1,8 +1,8 @@
 pipeline {
         agent {
                 kubernetes {
-                    label 'charts-builder'
-                    defaultContainer 'tools'
+                    label 'ctenorio'
+                    defaultContainer 'ctenorio'
                     yaml """
         apiVersion: v1
         kind: Pod
