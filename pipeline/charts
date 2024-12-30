@@ -23,6 +23,18 @@ pipeline {
             }
         }
 
+    stage('Install Docker') {
+        steps {
+            sh '''
+                sudo apt-get update
+                sudo apt-get install -y docker.io
+                sudo systemctl start docker
+                sudo systemctl enable docker
+                sudo usermod -aG docker $(whoami)
+            '''
+        }
+    }
+
         stage('Install IBM Cloud CLI and Container Registry CLI') {
             steps {
                 sh '''
