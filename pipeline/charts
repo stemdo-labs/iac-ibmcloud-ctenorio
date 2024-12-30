@@ -13,7 +13,7 @@ pipeline {
     }
 
     environment {
-        IBM_CLOUD_API_KEY = credentials('IBM_CLOUD_API_KEY') // Asegúrate de configurar esta credencial en Jenkins
+        IBM_CLOUD_API_KEY = credentials('IBM_CLOUD_API_KEY') 
     }
 
     stages {
