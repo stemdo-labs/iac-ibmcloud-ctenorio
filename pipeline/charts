@@ -1,7 +1,8 @@
 pipeline {
     agent {
         kubernetes {
-            label 'ctenorio'
+            label 'jenkins-jenkins-agent'
+            defaultContainer 'jnlp'
         }
     }
 
