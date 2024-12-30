@@ -23,7 +23,7 @@ spec:
 """
         }
     }
-    }
+
     parameters {
         // Definir los parámetros equivalentes a inputs en GitHub Actions
         string(name: 'IMAGE_NAME', description: 'Nombre de la imagen Docker', defaultValue: 'prueba')
