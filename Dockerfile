@@ -1,2 +1,2 @@
-# Este Dockerfile no contiene configuraciones ni instrucciones.
-FROM scratch
+FROM alpine
+CMD ["echo", "Este es un Dockerfile mínimo funcional"]
