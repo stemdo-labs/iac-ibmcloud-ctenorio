@@ -25,16 +25,21 @@ jobs:
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
     - name: Package Helm Chart
-      run: |
-        helm package ${{ github.event.inputs.chart }}
       working-directory: ./charts
+      run: |
+        helm package ./${{ github.event.inputs.chart }}
 
     - name: List packaged charts
+      working-directory: ./charts
       run: |
-        ls -l ./charts
+        ls -l *.tgz || echo "No charts found"
 
     - name: Push Helm Chart to Harbor
-      run: |
-        CHART_FILE=$(ls ./charts/${{ github.event.inputs.chart }}-*.tgz)
-        helm push $CHART_FILE oci://uk.icr.io/ctenorio-cr
       working-directory: ./charts
+      run: |
+        CHART_FILE=$(find ./ -name "${{ github.event.inputs.chart }}-*.tgz")
+        if [ -z "$CHART_FILE" ]; then
+          echo "Error: No chart file found for ${{ github.event.inputs.chart }}"
+          exit 1
+        fi
+        helm push $CHART_FILE oci://uk.icr.io/ctenorio-cr
