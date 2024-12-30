@@ -1,5 +1,5 @@
 pipeline {
-   agent {
+agent {
         kubernetes {
             label 'charts-builder'
             defaultContainer 'tools'
@@ -9,30 +9,29 @@ kind: Pod
 spec:
   containers:
     - name: tools
-      image: ubuntu:22.04
-      command:
-      - cat
-      tty: true
+      image: docker:24.0.0-dind
       securityContext:
         privileged: true
       volumeMounts:
-      - mountPath: "/usr/local/bin"
-        name: bin-volume
-      - mountPath: "/home/jenkins/agent"
-        name: workspace-volume
-      - mountPath: "/var/lib/docker"
-        name: docker-volume
+        - mountPath: "/var/run/docker.sock"
+          name: docker-sock-volume
+        - mountPath: "/usr/local/bin"
+          name: bin-volume
+        - mountPath: "/home/jenkins/agent"
+          name: workspace-volume
   volumes:
-  - emptyDir: {}
-    name: bin-volume
-  - emptyDir:
-      medium: ""
-    name: workspace-volume
-  - emptyDir: {}
-    name: docker-volume
+    - emptyDir: {}
+      name: bin-volume
+    - emptyDir:
+        medium: ""
+      name: workspace-volume
+    - hostPath:
+        path: "/var/run/docker.sock"
+        type: Socket
+      name: docker-sock-volume
 """
         }
-}
+    }
     
     parameters {
         // Definir los parámetros equivalentes a inputs en GitHub Actions
