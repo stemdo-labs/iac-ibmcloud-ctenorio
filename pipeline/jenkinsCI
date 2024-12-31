@@ -9,6 +9,7 @@ pipeline {
     parameters {
         string(name: 'IMAGE_NAME', description: 'Nombre de la imagen Docker', defaultValue: 'prueba')
         string(name: 'VERSION', description: 'Versión de la imagen Docker', defaultValue: '1')
+        string(name: 'GIT_URL', description: 'Repositorio ci', defaultValue: '')
     }
     environment {
         IBM_CLOUD_API_KEY = credentials('IBM_CLOUD_API_KEY')
@@ -21,12 +22,15 @@ pipeline {
                 checkout scm
             }
         }
-         stage('Listar') {
+       
+
+        stage('Clonar repositorio ci') {
             steps {
-                sh 'ls'
+                script {
+                git branch: 'main', url: ${params.GIT_URL}
+                }
             }
         }
-
 
     
     stage('Instalar IBM Cloud CLI') {
