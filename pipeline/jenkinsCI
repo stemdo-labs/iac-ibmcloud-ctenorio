@@ -1,10 +1,10 @@
 pipeline {
         agent {
                 kubernetes {
-                    label 'ctenorio'
+                   label 'jenkins-jenkins-agent'
                     defaultContainer 'dind'
                 }
-                }
+        }
     
     parameters {
         string(name: 'IMAGE_NAME', description: 'Nombre de la imagen Docker', defaultValue: 'prueba')
