@@ -21,7 +21,7 @@ pipeline {
                 checkout scm
             }
         }
-         stage('Descargar Código del Repositorio') {
+         stage('Listar') {
             steps {
                 sh 'ls'
             }
