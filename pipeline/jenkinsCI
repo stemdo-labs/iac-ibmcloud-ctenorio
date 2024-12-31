@@ -1,0 +1,114 @@
+pipeline {
+        agent {
+                kubernetes {
+                    label 'ctenorio'
+                    defaultContainer 'tools'
+                    yaml """
+        apiVersion: v1
+        kind: Pod
+        spec:
+          containers:
+            - name: tools
+              image: ubuntu:22.04
+              command:
+              - cat
+              tty: true
+              securityContext:
+                privileged: true
+              volumeMounts:
+              - mountPath: "/usr/local/bin"
+                name: bin-volume
+              - mountPath: "/home/jenkins/agent"
+                name: workspace-volume
+              - mountPath: "/var/lib/docker"
+                name: docker-volume
+          volumes:
+          - emptyDir: {}
+            name: bin-volume
+          - emptyDir:
+              medium: ""
+            name: workspace-volume
+          - emptyDir: {}
+            name: docker-volume
+        """
+                }
+        }
+    
+    parameters {
+        string(name: 'IMAGE_NAME', description: 'Nombre de la imagen Docker', defaultValue: 'prueba')
+        string(name: 'VERSION', description: 'Versión de la imagen Docker', defaultValue: '1')
+    }
+    environment {
+        IBM_CLOUD_API_KEY = credentials('IBM_CLOUD_API_KEY')
+    }
+    stages {
+        stage('Descargar Código del Repositorio') {
+            steps {
+                checkout scm
+            }
+        }
+    
+       stage('Instalar Docker') {
+        steps {
+            script {
+                sh '''
+                    apt-get update && \
+                    apt-get install -y curl bash git docker.io
+                    dockerd > /var/log/dockerd.log 2>&1 &
+                '''
+            }
+        }
+    }
+
+    
+    stage('Instalar IBM Cloud CLI') {
+            steps {
+                sh 'curl -fsSL https://clis.cloud.ibm.com/install/linux | sh'
+                }
+            }
+
+        stage('Instalar IBM Cloud Container Registry Plugin') {
+            steps {
+                sh 'ibmcloud plugin install container-registry'
+            }
+        }
+        stage('Debug IBM Cloud Login Inputs') {
+            steps {
+                echo "API Key: ${env.IBM_CLOUD_API_KEY}" 
+            }
+        }
+        stage('Login to IBM Cloud') {
+             steps {
+                withCredentials([string(credentialsId: 'IBM_CLOUD_API_KEY', variable: 'API_KEY')]) {
+                    sh 'ibmcloud login --apikey ${API_KEY} -r eu-gb'
+                }
+            }
+        }
+        stage('Target Resource Group') {
+            steps {
+                sh 'ibmcloud target -g Stemdo_Sandbox'
+            }
+        }
+        stage('Configurar IBM Cloud Container Registry') {
+            steps {
+                script {
+                    sh '''
+                    ibmcloud cr login
+                    ibmcloud cr namespace-add ctenorio-cr
+                    '''
+                }
+            }
+        }
+
+        stage('Construir y Publicar la Imagen Docker') {
+            steps {
+                script {
+                    sh """
+                    docker build -t uk.icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION} .
+                    docker push uk.icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION}
+                    """
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,112 @@
+pipeline {
+    agent {
+        kubernetes {
+            label 'jenkins-jenkins-agent'
+            defaultContainer 'jnlp'
+        }
+    }
+
+    parameters {
+        choice(name: 'CHART',
+               choices: ['frontend-chart', 'backend-chart'],
+               description: 'Selecciona el chart a empaquetar y subir')
+    }
+
+    environment {
+        IBM_CLOUD_API_KEY = credentials('IBM_CLOUD_API_KEY') 
+    }
+
+    stages {
+        stage('Checkout Repository') {
+            steps {
+                checkout scm
+            }
+        }
+
+    stage('Install Docker') {
+        steps {
+            sh '''
+                apt-get update && \
+                apt-get install -y curl bash git docker.io
+            '''
+        }
+    }
+
+        stage('Install IBM Cloud CLI and Container Registry CLI') {
+            steps {
+                sh '''
+                    curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+                    ibmcloud plugin install container-registry
+                '''
+            }
+        }
+
+        stage('Authenticate with IBM Cloud Container Registry') {
+            steps {
+                sh '''
+                    ibmcloud login --apikey $IBM_CLOUD_API_KEY -r eu-gb
+                '''
+            }
+        }
+
+        stage('Target Resource Group') {
+            steps {
+                sh '''
+                    ibmcloud target -g Stemdo_Sandbox
+                '''
+            }
+        }
+
+        stage('Configurar IBM Cloud Container Registry') {
+            steps {
+                sh '''
+                    ibmcloud cr login
+                    ibmcloud cr namespace-add ctenorio-cr
+                '''
+            }
+        }
+
+        stage('Install Helm') {
+            steps {
+                sh '''
+                    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+                '''
+            }
+        }
+
+        stage('Package Helm Chart') {
+            steps {
+                dir('charts') {
+                    sh '''
+                        helm package ./${CHART}
+                    '''
+                }
+            }
+        }
+
+        stage('List Packaged Charts') {
+            steps {
+                dir('charts') {
+                    sh '''
+                        ls -l *.tgz || echo "No charts found"
+                    '''
+                }
+            }
+        }
+
+        stage('Push Helm Chart to CR IBMCloud') {
+            steps {
+                dir('charts') {
+                    sh '''
+                        CHART_FILE=$(find ./ -name "${CHART}-*.tgz")
+                        if [ -z "$CHART_FILE" ]; then
+                            echo "Error: No chart file found for $CHART"
+                            exit 1
+                        fi
+                        helm push $CHART_FILE oci://uk.icr.io/ctenorio-cr
+                    '''
+                }
+            }
+        }
+    }
+}

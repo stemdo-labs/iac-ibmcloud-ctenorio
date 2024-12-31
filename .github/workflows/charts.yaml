@@ -1,0 +1,62 @@
+name: Empaquetar y subir el chart
+on:
+  workflow_dispatch:
+    inputs:
+      chart:
+        description: "Selecciona el chart a empaquetar y subir"
+        required: true
+        type: choice
+        options:
+          - frontend
+          - backend
+        default: frontend
+
+jobs:
+  package-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install IBM Cloud CLI and Container Registry CLI
+      run: |
+        curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+        ibmcloud plugin install container-registry
+
+    - name: Authenticate with IBM Cloud Container Registry
+      run: |
+        ibmcloud login --apikey ${{ secrets.IBM_CLOUD_API_KEY }} -r eu-gb
+        
+    - name: Target Resource Group
+      run: |
+          ibmcloud target -g Stemdo_Sandbox
+
+    - name: Configurar IBM Cloud Container Registry
+      run: |
+          ibmcloud cr login
+          ibmcloud cr namespace-add ctenorio-cr
+        
+    - name: Install Helm
+      run: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+    - name: Package Helm Chart
+      working-directory: ./charts
+      run: |
+        helm package ./${{ github.event.inputs.chart }}
+
+    - name: List packaged charts
+      working-directory: ./charts
+      run: |
+        ls -l *.tgz || echo "No charts found"
+
+    - name: Push Helm Chart to Harbor
+      working-directory: ./charts
+      run: |
+        CHART_FILE=$(find ./ -name "${{ github.event.inputs.chart }}-*.tgz")
+        if [ -z "$CHART_FILE" ]; then
+          echo "Error: No chart file found for ${{ github.event.inputs.chart }}"
+          exit 1
+        fi
+        helm push $CHART_FILE oci://uk.icr.io/ctenorio-cr
