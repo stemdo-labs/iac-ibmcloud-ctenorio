@@ -42,6 +42,14 @@ pipeline {
         IBM_CLOUD_API_KEY = credentials('IBM_CLOUD_API_KEY')
     }
     stages {
+
+stage('Debug Parameters') {
+            steps {
+                echo "Received IMAGE_NAME: ${params.IMAGE_NAME}"
+                echo "Received VERSION: ${params.VERSION}"
+            }
+        }
+
         stage('Descargar Código del Repositorio') {
             steps {
                 checkout scm
