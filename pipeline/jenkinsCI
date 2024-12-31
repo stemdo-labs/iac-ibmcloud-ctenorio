@@ -21,6 +21,11 @@ pipeline {
                 checkout scm
             }
         }
+         stage('Descargar Código del Repositorio') {
+            steps {
+                sh 'ls'
+            }
+        }
 
 
     
