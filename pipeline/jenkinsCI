@@ -27,7 +27,7 @@ pipeline {
         stage('Clonar repositorio ci') {
             steps {
                 script {
-                git branch: 'main', url: ${params.GIT_URL}
+                git branch: 'main', url: "${params.GIT_URL}"
                 }
             }
         }
