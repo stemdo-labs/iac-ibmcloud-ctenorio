@@ -2,37 +2,9 @@ pipeline {
         agent {
                 kubernetes {
                     label 'ctenorio'
-                    defaultContainer 'tools'
-                    yaml """
-        apiVersion: v1
-        kind: Pod
-        spec:
-          containers:
-            - name: tools
-              image: ubuntu:22.04
-              command:
-              - cat
-              tty: true
-              securityContext:
-                privileged: true
-              volumeMounts:
-              - mountPath: "/usr/local/bin"
-                name: bin-volume
-              - mountPath: "/home/jenkins/agent"
-                name: workspace-volume
-              - mountPath: "/var/lib/docker"
-                name: docker-volume
-          volumes:
-          - emptyDir: {}
-            name: bin-volume
-          - emptyDir:
-              medium: ""
-            name: workspace-volume
-          - emptyDir: {}
-            name: docker-volume
-        """
+                    defaultContainer 'dind'
                 }
-        }
+                }
     
     parameters {
         string(name: 'IMAGE_NAME', description: 'Nombre de la imagen Docker', defaultValue: 'prueba')
@@ -43,30 +15,13 @@ pipeline {
     }
     stages {
 
-stage('Debug Parameters') {
-            steps {
-                echo "Received IMAGE_NAME: ${params.IMAGE_NAME}"
-                echo "Received VERSION: ${params.VERSION}"
-            }
-        }
 
         stage('Descargar Código del Repositorio') {
             steps {
                 checkout scm
             }
         }
-    
-       stage('Instalar Docker') {
-        steps {
-            script {
-                sh '''
-                    apt-get update && \
-                    apt-get install -y curl bash git docker.io
-                    dockerd > /var/log/dockerd.log 2>&1 &
-                '''
-            }
-        }
-    }
+
 
     
     stage('Instalar IBM Cloud CLI') {
