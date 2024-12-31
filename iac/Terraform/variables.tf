@@ -28,13 +28,7 @@ variable "public_ssh_key" {
 variable "vpc_cluster_id" {
   description = "VPC cluster id"
   type        = string
-  default = "r050-4bd8bde6-760a-4fa0-a88f-989f1fcbc107"
-}
-
-variable "bastion_public_ip" {
-  description = "IP pública del bastion host (clúster)"
-  type        = string
-  default     = "13.120.87.224" 
+  default = "r050-64f6b26f-1498-4ab1-b73b-c74d5afcf4ee"
 }
 
 
