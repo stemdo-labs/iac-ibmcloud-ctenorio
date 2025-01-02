@@ -7,7 +7,7 @@ pipeline {
         }
     
     parameters {
-        string(name: 'IMAGE_NAME', description: 'Nombre de la imagen Docker', defaultValue: '')
+        string(name: 'CHART_NAME', description: 'Nombre de la imagen Docker', defaultValue: '')
         string(name: 'VERSION', description: 'Versión de la imagen Docker', defaultValue: '')
         string(name: 'GIT_URL', description: 'Repositorio CD', defaultValue: '')
     }
@@ -77,9 +77,9 @@ pipeline {
             steps {
                 script {
                     sh """
-                    helm upgrade --install ${params.IMAGE_NAME} ./${params.CHART_NAME} \
+                    helm upgrade --install ${params.CHART_NAME} ./${params.CHART_NAME} \
                         --values ./${params.CHART_NAME}/values.yaml \
-                        --set image.repository=uk.icr.io/ctenorio-cr/${params.IMAGE_NAME} \
+                        --set image.repository=uk.icr.io/ctenorio-cr/${params.CHART_NAME} \
                         --set image.tag=${params.VERSION}
                     """
                 }
