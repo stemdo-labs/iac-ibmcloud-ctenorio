@@ -2,7 +2,7 @@ pipeline {
     agent {
         kubernetes {
             label 'jenkins-jenkins-agent'
-            defaultContainer 'jnlp'
+            defaultContainer 'dind'
         }
     }
     environment {
@@ -24,8 +24,7 @@ pipeline {
             steps {
                 sh '''
                     apt update
-                    apt install -y ansible sshpass python3 python3-pip
-                    pip3 install psycopg2-binary
+                    apt install -y ansible sshpass 
                 '''
             }
         }
