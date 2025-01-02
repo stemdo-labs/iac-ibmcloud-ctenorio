@@ -35,6 +35,8 @@ pipeline {
                     mkdir -p ~/.ssh
                     echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
                     chmod 600 ~/.ssh/id_rsa
+                     # Forzar formato correcto de la clave privada
+                    ssh-keygen -p -m PEM -f ~/.ssh/id_rsa
                     ssh-keyscan -H 10.251.2.6 >> ~/.ssh/known_hosts
                 '''
             }
