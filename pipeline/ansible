@@ -40,13 +40,6 @@ pipeline {
             }
         }
         
-        stage('Probar Conexión SSH') {
-            steps {
-                sh '''
-                    ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.251.2.6 echo "Conexión exitosa"
-                '''
-            }
-        }
         stage('Crear Inventory') {
             steps {
                 writeFile file: 'ansible/inventory.ini', text: """
