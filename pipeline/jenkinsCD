@@ -32,6 +32,14 @@ pipeline {
             }
         }
 
+
+        stage('Instalar IBM Cloud CLI') {
+            steps {
+                sh 'curl -fsSL https://clis.cloud.ibm.com/install/linux | sh'
+                }
+            }
+
+
         stage('Instalar IBM Cloud Container Registry Plugin') {
             steps {
                 sh 'ibmcloud plugin install container-registry'
