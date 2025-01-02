@@ -63,7 +63,7 @@
       become_user: root
       lineinfile:
         path: "/etc/postgresql/12/main/pg_hba.conf"
-        regexp: '^host\s+all\s+myuser\s+10.0.1.4/32\s+md5'
+        regexp: '^host\s+all\s+myuser\s+10.251.2.6/32\s+md5'
         line: "host    all             myuser        0.0.0.0/0               md5"
         state: present
   
