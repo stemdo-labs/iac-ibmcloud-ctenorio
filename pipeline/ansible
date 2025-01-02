@@ -7,7 +7,6 @@ pipeline {
     }
     environment {
         SSH_PRIVATE_KEY = credentials('SSH_PRIVATE_KEY')
-        IP_PRIVADA = credentials('IP_PRIVADA')
         DB_NAME = credentials('DB_NAME')
         DB_USER = credentials('DB_USER')
         PGPASSWORD = credentials('PGPASSWORD')
@@ -36,7 +35,7 @@ pipeline {
                     mkdir -p ~/.ssh
                     echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
                     chmod 600 ~/.ssh/id_rsa
-                    ssh-keyscan -H $IP_PRIVADA >> ~/.ssh/known_hosts
+                    ssh-keyscan -H 10.251.2.6 >> ~/.ssh/known_hosts
                 '''
             }
         }
@@ -44,7 +43,7 @@ pipeline {
             steps {
                 writeFile file: 'ansible/inventory.ini', text: """
                     [postgresql_servers]
-                    ${IP_PRIVADA} ansible_user=root
+                    10.251.2.6 ansible_user=root
                 """
             }
         }
