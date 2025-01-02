@@ -81,6 +81,7 @@ pipeline {
                         --values ./${params.CHART_NAME}/values.yaml \
                         --set image.repository=uk.icr.io/ctenorio-cr/${params.CHART_NAME} \
                         --set image.tag=${params.VERSION}
+                        --namespace ns-cntenorio
                     """
                 }
             }
