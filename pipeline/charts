@@ -41,7 +41,7 @@ pipeline {
             }
         }
 
-        stage('Authenticate with IBM Cloud Container Registry') {
+        stage('Login with IBM Cloud Container Registry') {
             steps {
                 sh '''
                     ibmcloud login --apikey $IBM_CLOUD_API_KEY -r eu-gb
@@ -84,15 +84,6 @@ pipeline {
             }
         }
 
-        stage('List Packaged Charts') {
-            steps {
-                dir('charts') {
-                    sh '''
-                        ls -l *.tgz || echo "No charts found"
-                    '''
-                }
-            }
-        }
 
         stage('Push Helm Chart to CR IBMCloud') {
             steps {
@@ -100,7 +91,6 @@ pipeline {
                     sh '''
                         CHART_FILE=$(find ./ -name "${CHART}-*.tgz")
                         if [ -z "$CHART_FILE" ]; then
-                            echo "Error: No chart file found for $CHART"
                             exit 1
                         fi
                         helm push $CHART_FILE oci://uk.icr.io/ctenorio-cr
