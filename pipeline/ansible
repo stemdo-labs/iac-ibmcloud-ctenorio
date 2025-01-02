@@ -24,8 +24,8 @@ pipeline {
         stage('Instalar Ansible ') {
             steps {
                 sh '''
-                    apt update
-                    apt install -y ansible sshpass 
+                    apk update
+                    apk install -y ansible sshpass 
                 '''
             }
         }
