@@ -7,20 +7,22 @@ pipeline {
         }
     
     parameters {
-        string(name: 'IMAGE_NAME', description: 'Nombre de la imagen Docker', defaultValue: 'prueba')
-        string(name: 'VERSION', description: 'Versión de la imagen Docker', defaultValue: '1')
-        string(name: 'GIT_URL', description: 'Repositorio ci', defaultValue: '')
+        string(name: 'IMAGE_NAME', description: 'Nombre de la imagen Docker', defaultValue: '')
+        string(name: 'VERSION', description: 'Versión de la imagen Docker', defaultValue: '')
+        string(name: 'GIT_URL', description: 'Repositorio CD', defaultValue: '')
     }
+
     environment {
         IBM_CLOUD_API_KEY = credentials('IBM_CLOUD_API_KEY')
     }
+
     stages {
+
         stage('Descargar Código del Repositorio') {
             steps {
                 checkout scm
             }
         }
-       
 
         stage('Clonar repositorio ci') {
             steps {
@@ -29,13 +31,6 @@ pipeline {
                 }
             }
         }
-
-    
-    stage('Instalar IBM Cloud CLI') {
-            steps {
-                sh 'curl -fsSL https://clis.cloud.ibm.com/install/linux | sh'
-                }
-            }
 
         stage('Instalar IBM Cloud Container Registry Plugin') {
             steps {
@@ -70,15 +65,20 @@ pipeline {
             }
         }
 
-        stage('Construir y Publicar la Imagen Docker') {
+        stage('Desplegar Imagen con Helm') {
             steps {
                 script {
                     sh """
-                    docker build -t uk.icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION} .
-                    docker push uk.icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION}
+                    helm upgrade --install ${params.IMAGE_NAME} ./${params.CHART_NAME} \
+                        --values ./${params.CHART_NAME}/values.yaml \
+                        --set image.repository=uk.icr.io/ctenorio-cr/${params.IMAGE_NAME} \
+                        --set image.tag=${params.VERSION}
                     """
                 }
             }
+
         }
+
     }
+        
 }
