@@ -118,7 +118,7 @@ resource "ibm_is_instance" "vm_db" {
     }
   }
 
-  #keys = [ ibm_is_ssh_key.ssh_key.id ]
+  keys = [ ibm_is_ssh_key.ssh_key.id ]
 
    #   connection {
   #     type = "ssh"
