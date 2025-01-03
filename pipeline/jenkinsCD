@@ -77,8 +77,8 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    if ! oc get project ctenorio; then
-                        oc new-project ctenorio
+                    if ! oc get namespace ctenorio; then
+                        oc create namespace ctenorio
                     fi
                     '''
                 }
