@@ -7,7 +7,7 @@ pipeline {
         }
     
     parameters {
-        string(name: 'CHART_NAME', description: 'Nombre de la imagen Docker', defaultValue: '')
+        string(name: 'IMAGE_NAME', description: 'Nombre de la imagen Docker', defaultValue: '')
         string(name: 'VERSION', description: 'Versión de la imagen Docker', defaultValue: '')
         string(name: 'GIT_URL', description: 'Repositorio CD', defaultValue: '')
     }
@@ -96,9 +96,9 @@ pipeline {
             steps {
                 script {
                     sh """
-                    helm upgrade --install ${params.CHART_NAME} ./charts/frontend-chart \
+                    helm upgrade --install ${params.IMAGE_NAME} ./charts/frontend-chart \
                         --values ./frontend/values.yaml \
-                        --set image.repository=icr.io/ctenorio-cr/${params.CHART_NAME} \
+                        --set image.repository=icr.io/ctenorio-cr/${params.IMAGE_NAME} \
                         --set image.tag=${params.VERSION}
                         --namespace ctenorio 
                     """
