@@ -91,6 +91,18 @@ pipeline {
             }
         }
 
+        stage('Crear Namespace') {
+            steps {
+                script {
+                    sh """
+                    if ! kubectl get namespace ctenorio; then
+                        kubectl create namespace ctenorio
+                    fi
+                    """
+                }
+            }
+        }
+
      
         stage('Desplegar Imagen con Helm') {
             steps {
