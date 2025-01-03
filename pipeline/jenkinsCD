@@ -57,6 +57,15 @@ pipeline {
                 }
             }
         }
+
+        stage('Conectarse al cluster') {
+             steps {
+                    sh 'ibmcloud ks cluster config --cluster ez-ibm-openshift-vpc-w9ox --adminOK'
+                }
+            }
+        }
+
+
         stage('Target Resource Group') {
             steps {
                 sh 'ibmcloud target -g Stemdo_Sandbox'
