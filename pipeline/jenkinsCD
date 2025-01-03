@@ -73,6 +73,19 @@ pipeline {
             }
         }
 
+        stage('Crear Namespace') {
+            steps {
+                script {
+                    sh '''
+                    if ! oc get project ctenorio; then
+                        oc new-project ctenorio
+                    fi
+                    '''
+                }
+            }
+        }
+
+
         stage('Desplegar Imagen con Helm') {
             steps {
                 script {
