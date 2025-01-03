@@ -96,7 +96,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    helm upgrade --install ${params.IMAGE_NAME} ./charts/frontend-chart \
+                    helm upgrade --install ${params.IMAGE_NAME} oci://icr.io/ctenorio-cr/frontend-chart \
                         --values ./frontend/values.yaml \
                         --set image.repository=icr.io/ctenorio-cr/${params.IMAGE_NAME} \
                         --set image.tag=${params.VERSION}
