@@ -19,6 +19,15 @@ pipeline {
                 checkout scm
             }
         }
+
+        stage('Instalar Ansible ') {
+            steps {
+                sh '''
+                    apt update
+                    apt install -y ansible sshpass 
+                '''
+            }
+        }
     
         stage('Configurar SSH key') {
             steps {
