@@ -66,8 +66,8 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    ibmcloud cr login
-                    ibmcloud cr namespace-add ctenorio-cr
+                     ibmcloud cr region-set global
+                     ibmcloud cr login
                     '''
                 }
             }
@@ -80,9 +80,9 @@ pipeline {
                     sh """
                     helm upgrade --install ${params.CHART_NAME} ./${params.CHART_NAME} \
                         --values ./${params.CHART_NAME}/values.yaml \
-                        --set image.repository=uk.icr.io/ctenorio-cr/${params.CHART_NAME} \
+                        --set image.repository=icr.io/ctenorio-cr/${params.CHART_NAME} \
                         --set image.tag=${params.VERSION}
-                        --namespace ctenorio --debug
+                        --namespace ctenorio 
                     """
                 }
             }

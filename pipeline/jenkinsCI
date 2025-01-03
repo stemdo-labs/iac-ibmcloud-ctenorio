@@ -63,8 +63,8 @@ pipeline {
             steps {
                 script {
                     sh '''
+                    ibmcloud cr region-set global
                     ibmcloud cr login
-                    ibmcloud cr namespace-add ctenorio-cr
                     '''
                 }
             }
@@ -74,8 +74,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker build -t uk.icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION} .
-                    docker push uk.icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION}
+                    docker build -t icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION} .
+                    docker push icr.io/ctenorio-cr/${params.IMAGE_NAME}:${params.VERSION}
                     """
                 }
             }
