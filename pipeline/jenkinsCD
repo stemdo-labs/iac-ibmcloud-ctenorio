@@ -63,7 +63,6 @@ pipeline {
                     sh 'ibmcloud ks cluster config --cluster ez-ibm-openshift-vpc-w9ox --adminOK'
                 }
             }
-        }
 
 
         stage('Target Resource Group') {
