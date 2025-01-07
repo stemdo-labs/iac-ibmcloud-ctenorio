@@ -28,7 +28,7 @@ variable "public_ssh_key" {
 variable "vpc_cluster_id" {
   description = "VPC cluster id"
   type        = string
-  default = "r050-587b3a3d-a6b2-45c3-bf44-c1089c4b65b1"
+  default = "r050-6ef91ca3-33d6-4030-8854-ead64060be7a"
 }
 
 
