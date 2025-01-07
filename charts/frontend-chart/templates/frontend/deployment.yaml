@@ -41,7 +41,7 @@ spec:
             periodSeconds: {{ .Values.frontend.livenessProbe.periodSeconds }}
           volumeMounts:
             - name: tmp
-            - mountPath: /tmp
+              mountPath: /tmp
         securityContext:
           runAsUser: 1001  
           fsGroup: 1001     
