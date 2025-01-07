@@ -43,8 +43,8 @@ spec:
             - name: tmp
               mountPath: /tmp
         securityContext:
-          runAsUser: 1001  
-          fsGroup: 1001     
+          runAsUser: 1001
+          fsGroup: 1001
       volumes:
         - name: tmp
           emptyDir: {}
