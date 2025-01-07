@@ -130,8 +130,6 @@ pipeline {
                     sh """
                     helm upgrade --install ${params.APP_TYPE} oci://icr.io/ctenorio-cr/${params.APP_TYPE}-chart \
                         --values ./${params.APP_TYPE}/values.yaml \
-                        --set image.repository=icr.io/ctenorio-cr/${params.APP_TYPE}-app \
-                        --set image.tag=${params.VERSION} \
                         --namespace ctenorio
                     """
         }
