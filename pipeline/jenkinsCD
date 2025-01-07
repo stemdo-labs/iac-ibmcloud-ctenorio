@@ -124,19 +124,29 @@ pipeline {
 
      
         stage('Desplegar Imagen con Helm') {
-            steps {
-                script {
-                    sh """
-                    helm upgrade --install ${params.IMAGE_NAME} oci://icr.io/ctenorio-cr/frontend-chart \
-                        --values ./frontend/values.yaml \
-                        --set image.repository=icr.io/ctenorio-cr/${params.IMAGE_NAME} \
-                        --set image.tag=${params.VERSION}  \
-                        --namespace ctenorio 
-                    """
-                }
+    steps {
+        script {
+            def chartPath = ""
+            def valuesPath = ""
+
+            if (params.APP_TYPE == 'frontend') {
+                chartPath = "oci://icr.io/ctenorio-cr/frontend-chart"
+                valuesPath = "./frontend/values.yaml"
+            } else if (params.APP_TYPE == 'backend') {
+                chartPath = "oci://icr.io/ctenorio-cr/backend-chart"
+                valuesPath = "./backend/values.yaml"
             }
 
+            sh """
+            helm upgrade --install ${params.IMAGE_NAME} ${chartPath} \
+                --values ${valuesPath} \
+                --set image.repository=icr.io/ctenorio-cr/${params.IMAGE_NAME} \
+                --set image.tag=${params.VERSION} \
+                --namespace ctenorio
+            """
         }
+    }
+}
 
     }
         
