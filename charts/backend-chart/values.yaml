@@ -2,10 +2,8 @@
 backend:
   name: backend  # Nombre del backend
   replicas: 1  # Número de réplicas
-  imagePullSecrets: ""
-  namespace: "ns-cntenorio"
   image:
-    repository: acrcntenorio.azurecr.io/backend-app
+    repository: icr.io/ctenorio-cr/backend-app
     tag: latest
   port: 8080  # Puerto de la aplicación
   SPRING_DB_HOST: "localhost"
