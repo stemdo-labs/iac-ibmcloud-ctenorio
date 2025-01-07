@@ -7,7 +7,7 @@ pipeline {
         }
     
     parameters {
-        string(name: 'IMAGE_NAME', description: 'Nombre de la imagen Docker', defaultValue: '')
+        string(name: 'APP_TYPE', description: 'Nombre de la imagen Docker', defaultValue: '')
         string(name: 'VERSION', description: 'Versión de la imagen Docker', defaultValue: '')
         string(name: 'GIT_URL', description: 'Repositorio CD', defaultValue: '')
     }
@@ -124,26 +124,16 @@ pipeline {
 
      
         stage('Desplegar Imagen con Helm') {
-    steps {
-        script {
-            def chartPath = ""
-            def valuesPath = ""
-
-            if (params.APP_TYPE == 'frontend') {
-                chartPath = "oci://icr.io/ctenorio-cr/frontend-chart"
-                valuesPath = "./frontend/values.yaml"
-            } else if (params.APP_TYPE == 'backend') {
-                chartPath = "oci://icr.io/ctenorio-cr/backend-chart"
-                valuesPath = "./backend/values.yaml"
-            }
-
-            sh """
-            helm upgrade --install ${params.IMAGE_NAME} ${chartPath} \
-                --values ${valuesPath} \
-                --set image.repository=icr.io/ctenorio-cr/${params.IMAGE_NAME} \
-                --set image.tag=${params.VERSION} \
-                --namespace ctenorio
-            """
+            steps {
+                script {
+        
+                    sh """
+                    helm upgrade --install ${params.APPT_YPE} oci://icr.io/ctenorio-cr/${params.APPT_YPE}-chart \
+                        --values ./${params.APPT_YPE}/values.yaml \
+                        --set image.repository=icr.io/ctenorio-cr/${params.APPT_YPE}-app \
+                        --set image.tag=${params.VERSION} \
+                        --namespace ctenorio
+                    """
         }
     }
 }
