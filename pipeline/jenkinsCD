@@ -128,9 +128,9 @@ pipeline {
                 script {
         
                     sh """
-                    helm upgrade --install ${params.APPT_YPE} oci://icr.io/ctenorio-cr/${params.APPT_YPE}-chart \
-                        --values ./${params.APPT_YPE}/values.yaml \
-                        --set image.repository=icr.io/ctenorio-cr/${params.APPT_YPE}-app \
+                    helm upgrade --install ${params.APP_TYPE} oci://icr.io/ctenorio-cr/${params.APP_TYPE}-chart \
+                        --values ./${params.APP_TYPE}/values.yaml \
+                        --set image.repository=icr.io/ctenorio-cr/${params.APP_TYPE}-app \
                         --set image.tag=${params.VERSION} \
                         --namespace ctenorio
                     """
