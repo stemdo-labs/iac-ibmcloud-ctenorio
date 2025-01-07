@@ -41,4 +41,10 @@ spec:
             periodSeconds: {{ .Values.frontend.livenessProbe.periodSeconds }}
           securityContext:
             runAsUser: 1001
-            fsGroup: 1001
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
