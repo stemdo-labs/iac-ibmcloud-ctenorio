@@ -15,7 +15,8 @@ spec:
       labels:
         app: {{ .Values.backend.name }}
     spec:
-      imagePullSecrets: ibm-registry-secret
+      imagePullSecrets:
+      - name: ibm-registry-secret
       containers:
       - name: {{ .Values.backend.name }}
         image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
