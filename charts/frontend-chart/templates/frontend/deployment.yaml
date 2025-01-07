@@ -16,7 +16,7 @@ spec:
         app: frontend
     spec:
       imagePullSecrets: 
-        - name: acr-secret
+        - name: ibm-registry-secret
       containers:
       - name: frontend
         image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
