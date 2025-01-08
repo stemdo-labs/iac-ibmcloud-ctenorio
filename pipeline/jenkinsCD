@@ -95,8 +95,11 @@ pipeline {
             steps {
                 script {
                     sh """
-                    if ! kubectl get namespace ctenorio; then
-                        kubectl create namespace ctenorio
+                    if ! oc get ns ctenorio &>/dev/null; then
+                        oc create ns ctenorio
+                        oc adm policy add-scc-to-user anyuid -z default -n ctenorio
+                    else
+                        echo "El proyecto 'ctenorio' ya existe. No se crea nuevamente."
                     fi
                     """
                 }
