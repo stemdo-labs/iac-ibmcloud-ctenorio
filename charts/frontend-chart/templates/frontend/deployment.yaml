@@ -21,7 +21,7 @@ spec:
       - name: frontend
         image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
         ports:
-        - containerPort: 80
+        - containerPort: 8081
         resources:
           requests:
             memory: {{ .Values.frontend.resources.requests.memory }}
