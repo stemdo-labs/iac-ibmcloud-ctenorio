@@ -42,7 +42,7 @@ spec:
           initialDelaySeconds: {{ .Values.frontend.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.frontend.livenessProbe.periodSeconds }}
         securityContext:
-          runAsUser: 1000660001
+          runAsUser: 1000680001
           runAsGroup: 997
           runAsNonRoot: true
           seccompProfile:
