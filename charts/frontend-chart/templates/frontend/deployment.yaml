@@ -43,7 +43,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /
-              port: 8080
+              port: 8083
             initialDelaySeconds: {{ .Values.frontend.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.frontend.readinessProbe.periodSeconds }}
           volumeMounts:
