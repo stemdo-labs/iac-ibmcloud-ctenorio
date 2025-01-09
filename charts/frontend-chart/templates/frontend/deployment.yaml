@@ -21,7 +21,7 @@ spec:
         - name: frontend
           image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
           ports:
-            - containerPort: 8080
+            - containerPort: 8083
           resources:
             requests:
               memory: {{ .Values.frontend.resources.requests.memory }}
@@ -46,19 +46,11 @@ spec:
               port: 8080
             initialDelaySeconds: {{ .Values.frontend.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.frontend.readinessProbe.periodSeconds }}
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8080
-            initialDelaySeconds: {{ .Values.frontend.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.frontend.livenessProbe.periodSeconds }}
           volumeMounts:
             - name: cache-volume
               mountPath: /var/cache/nginx
             - name: run-volume
               mountPath: /var/run
-          ports:
-            - containerPort: 8080
       volumes:
         - name: cache-volume
           emptyDir: {}
