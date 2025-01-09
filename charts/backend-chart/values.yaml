@@ -5,7 +5,7 @@ backend:
   image:
     repository: icr.io/ctenorio-cr/backend-app
     tag: latest
-  port: 8080  # Puerto de la aplicación
+  port: 8083  # Puerto de la aplicación
   SPRING_DB_HOST: "localhost"
   SPRING_DB_PORT: "5432"
   SPRING_DB_NAME: "mydatabase"
