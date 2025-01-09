@@ -36,7 +36,6 @@ spec:
             seccompProfile:
               type: RuntimeDefault
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
             privileged: false
             capabilities:
               drop:
@@ -56,8 +55,12 @@ spec:
           volumeMounts:
             - name: cache-volume
               mountPath: /var/cache/nginx
+            - name: run-volume
+              mountPath: /var/run
           ports:
             - containerPort: 8080
       volumes:
         - name: cache-volume
+          emptyDir: {}
+        - name: run-volume
           emptyDir: {}
