@@ -18,8 +18,3 @@ frontend:
   livenessProbe:
     initialDelaySeconds: 10
     periodSeconds: 15
-  ingress:
-    enabled: true                    
-    hosts:                            
-      - host: cntenorio.rrhh.local          
-        paths: ["/"]  
