@@ -15,40 +15,48 @@ spec:
       labels:
         app: frontend
     spec:
-      imagePullSecrets: 
+      imagePullSecrets:
         - name: ibm-registry-secret
       containers:
-      - name: frontend
-        image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
-        ports:
-        - containerPort: 8081
-        resources:
-          requests:
-            memory: {{ .Values.frontend.resources.requests.memory }}
-            cpu: {{ .Values.frontend.resources.requests.cpu }}
-          limits:
-            memory: {{ .Values.frontend.resources.limits.memory }}
-            cpu: {{ .Values.frontend.resources.limits.cpu }}
-        securityContext:
-          runAsUser:  1000689998
-          runAsGroup: 997
-          runAsNonRoot: true
-          seccompProfile:
-            type: RuntimeDefault
-          allowPrivilegeEscalation: false
-          privileged: false
-          capabilities:
-            drop:
-              - ALL
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8081
-          initialDelaySeconds: {{ .Values.frontend.readinessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.frontend.readinessProbe.periodSeconds }}
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8081
-          initialDelaySeconds: {{ .Values.frontend.livenessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.frontend.livenessProbe.periodSeconds }}
+        - name: frontend
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+          ports:
+            - containerPort: 8081
+          resources:
+            requests:
+              memory: {{ .Values.frontend.resources.requests.memory }}
+              cpu: {{ .Values.frontend.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.frontend.resources.limits.memory }}
+              cpu: {{ .Values.frontend.resources.limits.cpu }}
+          securityContext:
+            runAsUser: 1000689998
+            runAsGroup: 997
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+            allowPrivilegeEscalation: false
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: {{ .Values.frontend.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.frontend.readinessProbe.periodSeconds }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: {{ .Values.frontend.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.frontend.livenessProbe.periodSeconds }}
+          volumeMounts:
+            - name: cache-volume
+              mountPath: /var/cache/nginx
+          ports:
+            - containerPort: 8090
+      volumes:
+        - name: cache-volume
+          emptyDir: {}
