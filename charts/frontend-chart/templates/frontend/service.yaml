@@ -8,5 +8,6 @@ spec:
     app: frontend
   ports:
     - protocol: TCP
-      port: 8083
+      port: 8093
+      targetPort: 8093
   type: ClusterIP
