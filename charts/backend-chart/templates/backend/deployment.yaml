@@ -55,14 +55,14 @@ spec:
           limits:
             memory: {{ .Values.backend.resources.limits.memory }}
             cpu: {{ .Values.backend.resources.limits.cpu }}
-         readinessProbe:
-          httpGet:
-            path: /api/empleados
-            port: 8080
-          initialDelaySeconds: 50
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/empleados
+              port: 8080
+            initialDelaySeconds: 50
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
 
 #        readinessProbe:
 #          httpGet:
