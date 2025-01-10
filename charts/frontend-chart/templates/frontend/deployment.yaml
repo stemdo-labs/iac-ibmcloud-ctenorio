@@ -30,7 +30,7 @@ spec:
               memory: {{ .Values.frontend.resources.limits.memory }}
               cpu: {{ .Values.frontend.resources.limits.cpu }}
           securityContext:
-            runAsUser: 1000689998
+            runAsUser: 1000659988
             runAsGroup: 997
             runAsNonRoot: true
             seccompProfile:
