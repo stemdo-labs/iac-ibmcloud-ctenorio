@@ -1,1 +1,67 @@
+pipeline {
+    agent any
 
+    environment {
+        IBM_CLOUD_API_KEY = credentials('IBM_CLOUD_API_KEY') 
+
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
+ stage('Login with IBM Cloud Container Registry') {
+            steps {
+                sh '''
+                    ibmcloud login --apikey $IBM_CLOUD_API_KEY -r eu-gb
+                '''
+            }
+        }
+
+        stage('Target Resource Group') {
+            steps {
+                sh '''
+                    ibmcloud target -g Stemdo_Sandbox
+                '''
+            }
+        }
+
+        stage('Configurar IBM Cloud Container Registry') {
+            steps {
+                sh '''
+                    ibmcloud cr region-set global
+                    ibmcloud cr login
+                '''
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh """
+                    docker build -t icr.io/ctenorio-cr/zap2docker-stable:latest .
+                """
+            }
+        }
+
+        stage('Push Docker Image to ICR') {
+            steps {
+                sh """
+                    docker push icr.io/ctenorio-cr/zap2docker-stable:latest
+                """
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo '✅ Docker image subida correctamente!'
+        }
+        failure {
+            echo '❌ Algo ha fallado :( .'
+        }
+    }
+}
