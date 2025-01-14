@@ -24,3 +24,6 @@ override.tf.json
 # Archivos sensibles o temporales
 .terraform.lock.hcl
 terraform.tfstate.backup
+
+#Archivo openssl.conf
+openssl.conf

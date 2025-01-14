@@ -55,19 +55,3 @@ spec:
           limits:
             memory: {{ .Values.backend.resources.limits.memory }}
             cpu: {{ .Values.backend.resources.limits.cpu }}
-#        readinessProbe:
-#          httpGet:
-#            path: /api/empleados
-#            port: {{ .Values.backend.port }}
-#          initialDelaySeconds: {{ .Values.backend.readinessProbe.initialDelaySeconds }}
-#          periodSeconds: {{ .Values.backend.readinessProbe.periodSeconds }}
-#          timeoutSeconds: {{ .Values.backend.readinessProbe.timeoutSeconds }}
-#          failureThreshold: {{ .Values.backend.readinessProbe.failureThreshold }}
-#        livenessProbe:
-#          httpGet:
-#            path: /api/empleados
-#            port: {{ .Values.backend.port }}
-#          initialDelaySeconds: {{ .Values.backend.livenessProbe.initialDelaySeconds }}
-#          periodSeconds: {{ .Values.backend.livenessProbe.periodSeconds }}
-#          timeoutSeconds: {{ .Values.backend.readinessProbe.timeoutSeconds }}
- #         failureThreshold: {{ .Values.backend.readinessProbe.failureThreshold }}
