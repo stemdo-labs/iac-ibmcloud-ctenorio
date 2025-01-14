@@ -72,6 +72,23 @@ resource "ibm_is_security_group_rule" "allow_ssh" {
   
 }
 
+
+resource "ibm_is_security_group_rule" "allow_postgres" {
+  direction      = "inbound"
+  remote         = "0.0.0.0/0"
+  ip_version     = "ipv4"
+  group =  ibm_is_security_group.ssh_security_group.idvsanchez.id
+
+  tcp {
+    port_min       = 5432
+    port_max       = 5432
+  }
+
+  depends_on = [ibm_is_security_group.ssh_security_group]
+  
+}
+ 
+
 # Crear una regla para habilitar el ping
 resource "ibm_is_security_group_rule" "allow_ping" {
   direction      = "inbound"
