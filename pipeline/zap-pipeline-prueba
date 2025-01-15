@@ -1,0 +1,41 @@
+pipeline {
+  agent any
+  environment {
+    ZAP_API_URL = 'http://zap-service.ctenorio.svc.cluster.local:8080'
+    API_URL = 'https://route-develop-vsanchez.ez-ibm-openshift-vpc-tl1o-b9be9ed6ae33d743815245d0b773ebc7-0000.eu-es.containers.appdomain.cloud'
+  }
+  stages {
+    stage('Run ZAP Spider') {
+      steps {
+        script {
+          // Ejecuta el Spider de ZAP para explorar la URL del API
+          sh """
+          curl "${ZAP_API_URL}/JSON/spider/action/scan/?url=${API_URL}"
+          """
+        }
+      }
+    }
+    stage('Check Spider Status') {
+      steps {
+        script {
+          // Verifica que el Spider haya terminado
+          sh """
+          until [ \$(curl -s "${ZAP_API_URL}/JSON/spider/view/status/" | grep -o '100') ]; do
+            echo 'Spider is running...'; sleep 5;
+          done
+          """
+        }
+      }
+    }
+    stage('Generate ZAP Report') {
+      steps {
+        script {
+          // Genera un informe HTML de ZAP
+          sh """
+          curl "${ZAP_API_URL}/OTHER/core/other/htmlreport/" -o zap_report.html
+          """
+        }
+      }
+    }
+  }
+}
