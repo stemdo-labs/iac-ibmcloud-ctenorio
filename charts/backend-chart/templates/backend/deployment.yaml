@@ -55,6 +55,7 @@ spec:
           limits:
             memory: {{ .Values.backend.resources.limits.memory }}
             cpu: {{ .Values.backend.resources.limits.cpu }}
+<<<<<<< HEAD
 
 
 #        readinessProbe:
@@ -73,3 +74,5 @@ spec:
 #          periodSeconds: {{ .Values.backend.livenessProbe.periodSeconds }}
 #          timeoutSeconds: {{ .Values.backend.readinessProbe.timeoutSeconds }}
  #         failureThreshold: {{ .Values.backend.readinessProbe.failureThreshold }}
+=======
+>>>>>>> 146eb1afdd90bb8445c3bf51fa81a4bcecd13679

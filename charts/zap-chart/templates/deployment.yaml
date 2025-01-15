@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zap-deploy
+  namespace: ctenorio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zap
+  template:
+    metadata:
+      labels:
+        app: zap
+    spec:
+      imagePullSecrets:
+        - name: ibm-registry-secret
+      containers:
+        - name: zap
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: 8080
+          args:
+            - zap.sh
+            - -daemon
+            - -host
+            - 0.0.0.0
+            - -port
+            - "8080"
+            - -config
+            - api.addrs.addr.name=.*
+            - -config
+            - api.addrs.addr.regex=true
+            - -config
+            - api.disablekey=true
+          # env:
+          #   - name: JAVA_OPTS
+          #     value: "-Djava.util.prefs.syncInterval=0"
+
+          # securityContext:
+          #   runAsUser: 1000660000
+          #   runAsNonRoot: true
+          #   allowPrivilegeEscalation: false
+          #   capabilities:
+          #     drop:
+          #       - ALL
+          #   seccompProfile:
+          #     type: RuntimeDefault
+          volumeMounts:
+            - name: zap-data
+              mountPath: /home/zap/.ZAP/
+      volumes:
+        - name: zap-data
+          emptyDir: {}

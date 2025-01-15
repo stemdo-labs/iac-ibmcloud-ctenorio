@@ -1,0 +1,6 @@
+apiVersion: v2
+name: zap-chart
+description: A Helm chart for OWASP ZAP
+type: application
+version: 0.1.1
+appVersion: "1.16.0"
