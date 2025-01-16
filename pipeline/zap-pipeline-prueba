@@ -54,7 +54,7 @@ pipeline {
         script {
           // Genera un reporte JSON utilizando el template especificado
           sh """
-          curl -X GET "${ZAP_API_URL}/JSON/reports/action/generate/?title=${params.REPORT_TITLE}&template=${params.REPORT_TEMPLATE}&description=API+Security+Report_JSON&contexts=&sites=&sections=&includedConfidences=&includedRisks=&reportFileName=zap_report_\$(date +'%Y%m%d_%H%M%S').json&display="
+          curl -X GET "${ZAP_API_URL}/JSON/reports/action/generate/?title=${params.REPORT_TITLE}&template=${params.REPORT_TEMPLATE}&description=API+Security+Report_JSON&contexts=&sites${API_URL}=&sections=&includedConfidences=&includedRisks=&reportFileName=zap_report_\$(date +'%Y%m%d_%H%M%S').json&display="
           """
         }
       }
