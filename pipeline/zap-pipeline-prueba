@@ -27,15 +27,26 @@ pipeline {
         }
       }
     }
+
     stage('Generate ZAP Report') {
       steps {
         script {
-          // Genera un informe HTML de ZAP
+          // Genera un informe utilizando el endpoint de Reports
           sh """
-          curl "${ZAP_API_URL}/OTHER/core/other/htmlreport/" -o "zap_report_\$(date +'%Y%m%d_%H%M%S').html"
+          curl -X GET "${ZAP_API_URL}/JSON/reports/action/generate/?title=${REPORT_TITLE}&template=${REPORT_TEMPLATE}&description=API+Security+Report&contexts=&sites=&sections=&includedConfidences=&includedRisks=&reportFileName=zap_report_\$(date +'%Y%m%d_%H%M%S').html&display="
           """
         }
       }
     }
+
+    stage('Generate ZAP JSON Report') {
+      steps {
+        script {
+          // Genera un reporte JSON utilizando el endpoint de ZAP
+          sh """
+          curl -X GET "${ZAP_API_URL}/JSON/core/view/alerts/?baseurl=${API_URL}" -o "zap_report_\$(date +'%Y%m%d_%H%M%S').json"
+          """
+        }
+    
   }
 }
