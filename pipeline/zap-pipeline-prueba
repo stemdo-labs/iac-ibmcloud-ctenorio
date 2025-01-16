@@ -1,8 +1,10 @@
 pipeline {
   agent any
-
+  
   parameters {
-    string(name: 'REPORT_TEMPLATE', defaultValue: 'traditional-json', description: 'Template a utilizar para el reporte')
+    choice(name: 'REPORT_TEMPLATE',
+               choices: ['traditional-json', 'traditional-html'],
+               description: 'Template a utilizar para el reporte')
     string(name: 'REPORT_TITLE', defaultValue: 'ZAP_Security_Report_JSON', description: 'Título del reporte')
   }
 
