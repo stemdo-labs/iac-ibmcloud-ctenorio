@@ -28,27 +28,27 @@ pipeline {
       }
     }
 
-    stage('Generate ZAP Report') {
+    stage('Generate ZAP Report prueba HTML') {
       steps {
         script {
           // Genera un informe utilizando el endpoint de Reports
           sh """
-          curl -X GET "${ZAP_API_URL}/JSON/reports/action/generate/?title=pruebactenorio&template=${REPORT_TEMPLATE}&description=API+Security+Report&contexts=&sites=&sections=&includedConfidences=&includedRisks=&reportFileName=zap_report_\$(date +'%Y%m%d_%H%M%S').html&display="
+          curl -X GET "${ZAP_API_URL}/JSON/reports/action/generate/?title=pruebactenorio&template=traditional-html&description=API+Security+Report&contexts=&sites=&sections=&includedConfidences=&includedRisks=&reportFileName=zap_report_\$(date +'%Y%m%d_%H%M%S').html&display="
           """
         }
       }
     }
 
-    stage('Generate ZAP JSON Report') {
+    stage('Generate ZAP Report prueba json') {
       steps {
         script {
-          // Genera un reporte JSON utilizando el endpoint de ZAP
+          // Genera un informe utilizando el endpoint de Reports
           sh """
-          curl -X GET "${ZAP_API_URL}/JSON/core/view/alerts/?baseurl=${API_URL}" -o "zap_report_\$(date +'%Y%m%d_%H%M%S').json"
+          curl -X GET "${ZAP_API_URL}/JSON/reports/action/generate/?title=pruebactenorio&template=traditional-json&description=API+Security+Report&contexts=&sites=&sections=&includedConfidences=&includedRisks=&reportFileName=zap_report_\$(date +'%Y%m%d_%H%M%S').html&display="
           """
         }
+      }
     }
-  }
     
   }
 }
