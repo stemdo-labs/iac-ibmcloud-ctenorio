@@ -1,13 +1,16 @@
 pipeline {
   agent any
+
   parameters {
     string(name: 'REPORT_TEMPLATE', defaultValue: 'traditional-json', description: 'Template a utilizar para el reporte')
     string(name: 'REPORT_TITLE', defaultValue: 'ZAP_Security_Report_JSON', description: 'Título del reporte')
   }
+
   environment {
     ZAP_API_URL = 'http://zap-service.ctenorio.svc.cluster.local:8099'
     API_URL = 'route-develop-vsanchez.ez-ibm-openshift-vpc-tl1o-b9be9ed6ae33d743815245d0b773ebc7-0000.eu-es.containers.appdomain.cloud'
   }
+
   stages {
     stage('Run ZAP Spider') {
       steps {
@@ -31,6 +34,18 @@ pipeline {
         }
       }
     }
+
+    stage('Generate ZAP Report prueba HTML') {
+          steps {
+            script {
+              // Genera un informe utilizando el endpoint de Reports
+              sh """
+              curl "${ZAP_API_URL}/OTHER/core/other/htmlreport/" -o "zap_report_\$(date +'%Y%m%d_%H%M%S').html"
+              """
+            }
+          }
+        }
+
 
    stage('Generate ZAP JSON Report') {
       steps {
