@@ -68,7 +68,7 @@ pipeline {
         stage('Conectarse al cluster') {
              steps {
                  sh """
-                        ibmcloud ks cluster config --cluster ez-ibm-openshift-vpc-tl1o --admin
+                        ibmcloud ks cluster config --cluster ez-ibm-openshift-vpc-3zyj --admin
                  """
            
                 }
