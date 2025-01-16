@@ -39,16 +39,7 @@ pipeline {
       }
     }
 
-    stage('Generate ZAP Report prueba json') {
-      steps {
-        script {
-          // Genera un informe utilizando el endpoint de Reports
-          sh """
-          curl -X GET "${ZAP_API_URL}/JSON/reports/action/generate/?title=pruebactenorio&template=traditional-json&description=API+Security+Report&contexts=&sites=&sections=&includedConfidences=&includedRisks=&reportFileName=zap_report_\$(date +'%Y%m%d_%H%M%S').html&display="
-          """
-        }
-      }
-    }
+
     
   }
 }
