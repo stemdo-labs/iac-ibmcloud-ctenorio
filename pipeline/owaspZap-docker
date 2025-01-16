@@ -54,10 +54,11 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Pull and tag image') {
             steps {
                 sh """
-                    docker build -t icr.io/ctenorio-cr/zap2docker-stable:latest .
+                    docker pull zaproxy/zap-stable:latest
+                    docker tag zaproxy/zap-stable:latest icr.io/ctenorio-cr/zap2docker-stable:latest
                 """
             }
         }
