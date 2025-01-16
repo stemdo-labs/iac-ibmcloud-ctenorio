@@ -13,7 +13,19 @@ pipeline {
             }
         }
 
- stage('Login with IBM Cloud Container Registry') {
+        stage('Instalar IBM Cloud CLI') {
+            steps {
+                sh 'curl -fsSL https://clis.cloud.ibm.com/install/linux | sh'
+                }
+            }
+
+        stage('Instalar IBM Cloud Container Registry Plugin') {
+            steps {
+                sh 'ibmcloud plugin install container-registry'
+            }
+        }
+
+         stage('Login with IBM Cloud Container Registry') {
             steps {
                 sh '''
                     ibmcloud login --apikey $IBM_CLOUD_API_KEY -r eu-gb
