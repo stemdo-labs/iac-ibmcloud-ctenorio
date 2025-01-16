@@ -25,9 +25,5 @@ override.tf.json
 .terraform.lock.hcl
 terraform.tfstate.backup
 
-<<<<<<< HEAD
-# Archivo openssl.conf
-=======
 #Archivo openssl.conf
->>>>>>> 146eb1afdd90bb8445c3bf51fa81a4bcecd13679
 openssl.conf
