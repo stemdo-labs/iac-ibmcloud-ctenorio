@@ -32,7 +32,7 @@ pipeline {
         script {
           // Genera un informe HTML de ZAP
           sh """
-          curl "${ZAP_API_URL}/OTHER/core/other/htmlreport/" -o "zap_report_$(date +'%Y%m%d_%H%M%S').html"
+          curl "${ZAP_API_URL}/OTHER/core/other/htmlreport/" -o "zap_report_\$(date +'%Y%m%d_%H%M%S').html"
           """
         }
       }
