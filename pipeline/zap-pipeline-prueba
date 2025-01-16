@@ -1,7 +1,7 @@
 pipeline {
   agent any
   environment {
-    ZAP_API_URL = 'http://zap-service.ctenorio.svc.cluster.local:8080'
+    ZAP_API_URL = 'http://zap-service.ctenorio.svc.cluster.local:8099'
     API_URL = 'https://juice-shop.herokuapp.com'
   }
   stages {
