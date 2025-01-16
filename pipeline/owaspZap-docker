@@ -1,6 +1,10 @@
 pipeline {
-    agent any
-
+        agent {
+            kubernetes {
+                label 'jenkins-jenkins-agent'
+                defaultContainer 'dind'
+            }
+        }
     environment {
         IBM_CLOUD_API_KEY = credentials('IBM_CLOUD_API_KEY') 
 
