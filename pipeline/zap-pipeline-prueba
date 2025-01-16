@@ -10,7 +10,7 @@ pipeline {
 
   environment {
     ZAP_API_URL = 'http://zap-service.ctenorio.svc.cluster.local:8099'
-    API_URL = 'route-develop-vsanchez.ez-ibm-openshift-vpc-tl1o-b9be9ed6ae33d743815245d0b773ebc7-0000.eu-es.containers.appdomain.cloud'
+    API_URL = 'https://juice-shop.herokuapp.com'
   }
 
   stages {
