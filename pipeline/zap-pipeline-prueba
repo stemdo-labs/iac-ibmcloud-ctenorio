@@ -33,7 +33,7 @@ pipeline {
         script {
           // Genera un informe utilizando el endpoint de Reports
           sh """
-          curl -X GET "${ZAP_API_URL}/JSON/reports/action/generate/?title=${REPORT_TITLE}&template=${REPORT_TEMPLATE}&description=API+Security+Report&contexts=&sites=&sections=&includedConfidences=&includedRisks=&reportFileName=zap_report_\$(date +'%Y%m%d_%H%M%S').html&display="
+          curl -X GET "${ZAP_API_URL}/JSON/reports/action/generate/?title=pruebactenorio&template=${REPORT_TEMPLATE}&description=API+Security+Report&contexts=&sites=&sections=&includedConfidences=&includedRisks=&reportFileName=zap_report_\$(date +'%Y%m%d_%H%M%S').html&display="
           """
         }
       }
