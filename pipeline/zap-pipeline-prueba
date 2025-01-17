@@ -9,7 +9,7 @@ pipeline {
   }
 
   environment {
-    ZAP_PROXY_URL = 'http://4bf5fe01-eu-es.lb.appdomain.cloud:8099'
+    ZAP_PROXY_URL = 'http://696450c9-eu-es.lb.appdomain.cloud:8099'
     API_ANALYZE_URL = 'https://route-ctenorio-ctenorio.ez-ibm-openshift-vpc-b9be9ed6ae33d743815245d0b773ebc7-0000.eu-es.containers.appdomain.cloud/'
   }
 
