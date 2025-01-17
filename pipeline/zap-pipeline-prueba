@@ -1,16 +1,16 @@
 pipeline {
   agent any
-  
+
   parameters {
     choice(name: 'REPORT_TEMPLATE',
-               choices: ['traditional-json', 'traditional-html'],
-               description: 'Template a utilizar para el reporte')
+           choices: ['traditional-json', 'traditional-html'],
+           description: 'Template a utilizar para el reporte')
     string(name: 'REPORT_TITLE', defaultValue: 'ZAP_Security_Report_JSON', description: 'Título del reporte')
   }
 
   environment {
-    ZAP_API_URL = 'http://4bf5fe01-eu-es.lb.appdomain.cloud:8099'
-    API_URL = 'https://zap/JSON/spider/action/scan/?url=https://route-ctenorio-ctenorio.ez-ibm-openshift-vpc-b9be9ed6ae33d743815245d0b773ebc7-0000.eu-es.containers.appdomain.cloud/'
+    ZAP_PROXY_URL = 'http://4bf5fe01-eu-es.lb.appdomain.cloud:8099'
+    API_ANALYZE_URL = 'https://route-ctenorio-ctenorio.ez-ibm-openshift-vpc-b9be9ed6ae33d743815245d0b773ebc7-0000.eu-es.containers.appdomain.cloud/'
   }
 
   stages {
@@ -19,17 +19,18 @@ pipeline {
         script {
           // Ejecuta el Spider de ZAP para explorar la URL del API
           sh """
-          curl "${ZAP_API_URL}/JSON/spider/action/scan/?url=${API_URL}"
+          curl -k --proxy ${ZAP_PROXY_URL} "https://zap/JSON/spider/action/scan/?url=${API_ANALYZE_URL}"
           """
         }
       }
     }
+
     stage('Check Spider Status') {
       steps {
         script {
           // Verifica que el Spider haya terminado
           sh """
-          until [ \$(curl -s "${ZAP_API_URL}/JSON/spider/view/status/" | grep -o '100') ]; do
+          until [ \$(curl -k --proxy ${ZAP_PROXY_URL} -s "https://zap/JSON/spider/view/status/" | grep -o '100') ]; do
             echo 'Spider is running...'; sleep 5;
           done
           """
@@ -37,28 +38,26 @@ pipeline {
       }
     }
 
-    stage('Generate ZAP Report prueba HTML') {
-          steps {
-            script {
-              // Genera un informe utilizando el endpoint de Reports
-              sh """
-              curl "${ZAP_API_URL}/OTHER/core/other/htmlreport/" -o "zap_report_ctenorio\$(date +'%Y%m%d_%H%M%S').html"
-              """
-            }
-          }
-        }
-
-
-   stage('Generate ZAP JSON Report') {
+    stage('Generate ZAP Report (HTML)') {
       steps {
         script {
-          // Genera un reporte JSON utilizando el template especificado
+          // Genera un informe HTML utilizando el endpoint de Reports
           sh """
-          curl -X GET "${ZAP_API_URL}/JSON/reports/action/generate/?title=${params.REPORT_TITLE}&template=${params.REPORT_TEMPLATE}&description=API+Security+Report_JSON&contexts=&sites${API_URL}=&sections=&includedConfidences=&includedRisks=&reportFileName=zap_report_\$(date +'%Y%m%d_%H%M%S').json&display="
+          curl -k --proxy ${ZAP_PROXY_URL} "https://zap/OTHER/core/other/htmlreport/" -o "zap_report_ctenorio\$(date +'%Y%m%d_%H%M%S').html"
           """
         }
       }
     }
 
+    stage('Generate ZAP JSON Report') {
+      steps {
+        script {
+          // Genera un reporte JSON utilizando el template especificado
+          sh """
+          curl -k --proxy ${ZAP_PROXY_URL} -X GET "https://zap/JSON/reports/action/generate/?title=${params.REPORT_TITLE}&template=${params.REPORT_TEMPLATE}&description=API+Security+Report_JSON&contexts=&sites=${API_ANALYZE_URL}&sections=&includedConfidences=&includedRisks=&reportFileName=zap_report_\$(date +'%Y%m%d_%H%M%S').json&display="
+          """
+        }
+      }
+    }
   }
 }
