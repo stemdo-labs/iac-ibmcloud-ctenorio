@@ -9,8 +9,8 @@ pipeline {
   }
 
   environment {
-    ZAP_API_URL = 'http://14989544-eu-es.lb.appdomain.cloud:8099'
-    API_URL = 'https://route-ctenorio-ctenorio.ez-ibm-openshift-vpc-3zyj-b9be9ed6ae33d743815245d0b773ebc7-0000.eu-es.containers.appdomain.cloud/'
+    ZAP_API_URL = 'https://696450c9-eu-es.lb.appdomain.cloud:8099'
+    API_URL = 'https://route-ctenorio-ctenorio.ez-ibm-openshift-vpc-b9be9ed6ae33d743815245d0b773ebc7-0000.eu-es.containers.appdomain.cloud'
   }
 
   stages {
