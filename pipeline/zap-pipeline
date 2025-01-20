@@ -3,20 +3,19 @@ pipeline {
         kubernetes {
             label 'jenkins-jenkins-agent'
             defaultContainer 'dind'
-            }
+        }
     }
     parameters {
-        string(name: 'TARGET_URL', defaultValue: '', description: 'URL a probar') // Entrada del usuario
+        string(name: 'TARGET_URL', defaultValue: '', description: 'URL a probar')
     }
     stages {
         stage('Run ZAP Scan') {
             steps {
                 script {
-                    // Ejecuta ZAP y genera un reporte en formato JSON
+                    // Ejecuta ZAP con compatibilidad para sh
                     sh """
-                        #!/bin/bash
                         docker run --rm -v \$(pwd):/zap/wrk:rw zaproxy/zap2docker-stable:latest \
-                        zap-full-scan.py -t \${params.TARGET_URL} -J zap-report.json
+                        zap-full-scan.py -t "$TARGET_URL" -J zap-report.json
                     """
                 }
             }
