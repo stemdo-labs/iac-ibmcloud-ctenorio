@@ -23,16 +23,10 @@ pipeline {
                 sh 'ibmcloud plugin install container-registry'
             }
         }
-        stage('Debug IBM Cloud Login Inputs') {
-            steps {
-                echo "API Key: ${env.IBM_CLOUD_API_KEY}"
-            }
-        }
+
         stage('Login to IBM Cloud') {
             steps {
-                withCredentials([string(credentialsId: 'IBM_CLOUD_API_KEY', variable: 'API_KEY')]) {
-                    sh 'ibmcloud login --apikey ${API_KEY} -r eu-gb'
-                }
+                    sh 'ibmcloud login --apikey ${IBM_CLOUD_API_KEY} -r eu-gb'
             }
         }
         stage('Target Resource Group') {
