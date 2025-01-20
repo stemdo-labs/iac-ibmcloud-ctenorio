@@ -8,20 +8,47 @@ pipeline {
     parameters {
         string(name: 'TARGET_URL', defaultValue: 'https://route-develop-vsanchez.ez-ibm-openshift-vpc-b9be9ed6ae33d743815245d0b773ebc7-0000.eu-es.containers.appdomain.cloud/', description: 'URL a probar')
     }
-    environment {
-        WORKSPACE_DIR = "${pwd()}" // Directorio actual para reportes
-    }
+
     stages {
-        stage('Download OWASP ZAP Docker Image') {
+     stage('Instalar IBM Cloud CLI') {
             steps {
-                script {
-                    // Descarga la imagen de OWASP ZAP
-                    sh """
-                        docker pull zaproxy/zap-stable
-                    """
+                sh 'curl -fsSL https://clis.cloud.ibm.com/install/linux | sh'
+                }
+            }
+
+        stage('Instalar IBM Cloud Container Registry Plugin') {
+            steps {
+                sh 'ibmcloud plugin install container-registry'
+            }
+        }
+        stage('Debug IBM Cloud Login Inputs') {
+            steps {
+                echo "API Key: ${env.IBM_CLOUD_API_KEY}" 
+            }
+        }
+        stage('Login to IBM Cloud') {
+             steps {
+                withCredentials([string(credentialsId: 'IBM_CLOUD_API_KEY', variable: 'API_KEY')]) {
+                    sh 'ibmcloud login --apikey ${API_KEY} -r eu-gb'
                 }
             }
         }
+        stage('Target Resource Group') {
+            steps {
+                sh 'ibmcloud target -g Stemdo_Sandbox'
+            }
+        }
+        stage('Configurar IBM Cloud Container Registry') {
+            steps {
+                script {
+                    sh '''
+                    ibmcloud cr region-set global
+                    ibmcloud cr login
+                    '''
+                }
+            }
+        }
+
         stage('Run OWASP ZAP Container') {
             steps {
                 script {
@@ -29,7 +56,7 @@ pipeline {
                     sh """
                         docker run -d --name owasp-zap \
                         -v ${WORKSPACE_DIR}:/zap/wrk:rw \
-                        owasp/zap2docker-stable /bin/bash
+                        icr.io/ctenorio-cr/zap2docker-stable:latest /bin/bash
                     """
                 }
             }
@@ -48,23 +75,23 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            script {
-                // Detiene y elimina el contenedor después del uso
-                sh """
-                    docker stop owasp-zap || true
-                    docker rm owasp-zap || true
-                """
+      post {
+            always {
+                script {
+                    // Detiene y elimina el contenedor después del uso
+                    sh """
+                        docker stop owasp-zap || true
+                        docker rm owasp-zap || true
+                    """
+                }
+                // Archiva los reportes generados como artefactos
+                archiveArtifacts artifacts: '*.json, *.html', fingerprint: true
             }
-            // Archiva los reportes generados como artefactos
-            archiveArtifacts artifacts: '*.json, *.html', fingerprint: true
+            success {
+                echo "OWASP ZAP Full Scan completado con éxito."
+            }
+            failure {
+                echo "El OWASP ZAP Full Scan detectó problemas."
+            }
         }
-        success {
-            echo "OWASP ZAP Full Scan completado con éxito."
-        }
-        failure {
-            echo "El OWASP ZAP Full Scan detectó problemas."
-        }
-    }
 }
