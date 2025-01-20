@@ -6,23 +6,18 @@ pipeline {
         }
     }
     parameters {
-        string(name: 'TARGET_URL', defaultValue: 'https://example.com', description: 'URL a probar')
+        string(name: 'TARGET_URL', defaultValue: 'https://route-develop-vsanchez.ez-ibm-openshift-vpc-b9be9ed6ae33d743815245d0b773ebc7-0000.eu-es.containers.appdomain.cloud/', description: 'URL a probar')
     }
     environment {
         REPORT_JSON = 'zap-report.json'
         REPORT_HTML = 'zap-report.html'
     }
-
-     
     stages {
-
-           stages {
-     stage('Instalar IBM Cloud CLI') {
+        stage('Instalar IBM Cloud CLI') {
             steps {
                 sh 'curl -fsSL https://clis.cloud.ibm.com/install/linux | sh'
-                }
             }
-
+        }
         stage('Instalar IBM Cloud Container Registry Plugin') {
             steps {
                 sh 'ibmcloud plugin install container-registry'
@@ -30,11 +25,11 @@ pipeline {
         }
         stage('Debug IBM Cloud Login Inputs') {
             steps {
-                echo "API Key: ${env.IBM_CLOUD_API_KEY}" 
+                echo "API Key: ${env.IBM_CLOUD_API_KEY}"
             }
         }
         stage('Login to IBM Cloud') {
-             steps {
+            steps {
                 withCredentials([string(credentialsId: 'IBM_CLOUD_API_KEY', variable: 'API_KEY')]) {
                     sh 'ibmcloud login --apikey ${API_KEY} -r eu-gb'
                 }
@@ -55,7 +50,6 @@ pipeline {
                 }
             }
         }
-
         stage('Run OWASP ZAP') {
             steps {
                 script {
@@ -72,7 +66,6 @@ pipeline {
             }
         }
     }
-
     post {
         always {
             script {
