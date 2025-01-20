@@ -1,101 +1,41 @@
 pipeline {
-    agent {
-        kubernetes {
-            label 'jenkins-jenkins-agent'
-            defaultContainer 'dind'
-        }
+    agent any
+    parameters {
+        string(name: 'TARGET_URL', defaultValue: 'https://example.com', description: 'URL a probar')
     }
     environment {
-        WORKSPACE_DIR = "${pwd()}"
+        REPORT_JSON = 'zap-report.json'
+        REPORT_HTML = 'zap-report.html'
     }
-
-    parameters {
-        string(name: 'TARGET_URL', defaultValue: 'https://route-develop-vsanchez.ez-ibm-openshift-vpc-b9be9ed6ae33d743815245d0b773ebc7-0000.eu-es.containers.appdomain.cloud/', description: 'URL a probar')
-    }
-
     stages {
-     stage('Instalar IBM Cloud CLI') {
-            steps {
-                sh 'curl -fsSL https://clis.cloud.ibm.com/install/linux | sh'
-                }
-            }
-
-        stage('Instalar IBM Cloud Container Registry Plugin') {
-            steps {
-                sh 'ibmcloud plugin install container-registry'
-            }
-        }
-        stage('Debug IBM Cloud Login Inputs') {
-            steps {
-                echo "API Key: ${env.IBM_CLOUD_API_KEY}" 
-            }
-        }
-        stage('Login to IBM Cloud') {
-             steps {
-                withCredentials([string(credentialsId: 'IBM_CLOUD_API_KEY', variable: 'API_KEY')]) {
-                    sh 'ibmcloud login --apikey ${API_KEY} -r eu-gb'
-                }
-            }
-        }
-        stage('Target Resource Group') {
-            steps {
-                sh 'ibmcloud target -g Stemdo_Sandbox'
-            }
-        }
-        stage('Configurar IBM Cloud Container Registry') {
+        stage('Run OWASP ZAP') {
             steps {
                 script {
-                    sh '''
-                    ibmcloud cr region-set global
-                    ibmcloud cr login
-                    '''
-                }
-            }
-        }
-
-        stage('Run OWASP ZAP Container') {
-            steps {
-                script {
-                    // Inicia el contenedor en modo demonio
+                    echo "Ejecutando OWASP ZAP..."
                     sh """
-                        docker run -d --name owasp-zap \
-                        -v ${WORKSPACE_DIR}:/zap/wrk:rw \
-                        icr.io/ctenorio-cr/zap2docker-stable:latest zap.sh -daemon
-                    """
-                }
-            }
-        }
-        stage('Execute ZAP Full Scan') {
-            steps {
-                script {
-                    // Ejecuta el script zap-full-scan.py dentro del contenedor
-                    sh """
-                        docker exec owasp-zap zap-full-scan.py \
+                        docker run --rm \
+                        -v ${WORKSPACE}:/zap/wrk:rw \
+                        zaproxy/zap2docker-stable:latest zap-baseline.py \
                         -t "${params.TARGET_URL}" \
-                        -J /zap/wrk/zap-report.json \
-                        -r /zap/wrk/zap-report.html
+                        -J /zap/wrk/${REPORT_JSON} \
+                        -r /zap/wrk/${REPORT_HTML}
                     """
                 }
             }
         }
     }
-      post {
-            always {
-                script {
-                    // Detiene y elimina el contenedor después del uso
-                    sh """
-                        docker stop owasp-zap || true
-                        docker rm owasp-zap || true
-                    """
-                }
-                // Archiva los reportes generados como artefactos
-                archiveArtifacts artifacts: '*.json, *.html', fingerprint: true
-            }
-            success {
-                echo "OWASP ZAP Full Scan completado con éxito."
-            }
-            failure {
-                echo "El OWASP ZAP Full Scan detectó problemas."
+    post {
+        always {
+            script {
+                echo "Archivando reportes generados..."
+                archiveArtifacts artifacts: "${REPORT_JSON}, ${REPORT_HTML}", fingerprint: true
             }
         }
+        success {
+            echo "OWASP ZAP Scan completado con éxito."
+        }
+        failure {
+            echo "OWASP ZAP Scan detectó problemas."
+        }
+    }
 }
