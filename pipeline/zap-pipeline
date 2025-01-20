@@ -6,7 +6,7 @@ pipeline {
         }
     }
     parameters {
-        string(name: 'TARGET_URL', defaultValue: '', description: 'URL a probar')
+        string(name: 'TARGET_URL', defaultValue: 'https://route-develop-vsanchez.ez-ibm-openshift-vpc-b9be9ed6ae33d743815245d0b773ebc7-0000.eu-es.containers.appdomain.cloud/', description: 'URL a probar')
     }
     environment {
         WORKSPACE_DIR = "${pwd()}" // Directorio actual para reportes
