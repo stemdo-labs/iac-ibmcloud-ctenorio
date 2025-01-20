@@ -1,0 +1,24 @@
+pipeline {
+    agent 
+    parameters {
+        string(name: 'TARGET_URL', defaultValue: '', description: 'URL a probar') // Entrada del usuario
+    }
+    stages {
+        stage('Run ZAP Scan') {
+            steps {
+                script {
+                    // Ejecuta ZAP y genera un reporte en formato JSON
+                    sh """
+                        docker run --rm -v $(pwd):/zap/wrk:rw zaproxy/zap2docker-stable:latest \
+                        zap-full-scan.py -t ${params.TARGET_URL} -J zap-report.json
+                    """
+                }
+            }
+        }
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: 'zap-report.json', fingerprint: true
+        }
+    }
+}
