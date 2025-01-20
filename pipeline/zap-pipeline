@@ -60,7 +60,7 @@ pipeline {
                     sh """
                         docker run -d --name owasp-zap \
                         -v ${WORKSPACE_DIR}:/zap/wrk:rw \
-                        icr.io/ctenorio-cr/zap2docker-stable:latest /bin/bash
+                        icr.io/ctenorio-cr/zap2docker-stable:latest zap.sh -daemon
                     """
                 }
             }
