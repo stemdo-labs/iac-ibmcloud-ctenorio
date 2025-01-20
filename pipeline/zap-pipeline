@@ -14,8 +14,8 @@ pipeline {
                 script {
                     // Ejecuta ZAP y genera un reporte en formato JSON
                     sh """
-                        docker run --rm -v $(pwd):/zap/wrk:rw zaproxy/zap2docker-stable:latest \
-                        zap-full-scan.py -t ${params.TARGET_URL} -J zap-report.json
+                        docker run --rm -v \$(pwd):/zap/wrk:rw zaproxy/zap2docker-stable:latest \
+                        zap-full-scan.py -t \${params.TARGET_URL} -J zap-report.json
                     """
                 }
             }
