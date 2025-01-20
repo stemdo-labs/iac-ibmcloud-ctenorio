@@ -1,0 +1,37 @@
+pipeline {
+    agent any
+    stages {
+        stage('Start ZAP') {
+            steps {
+                zapStart zapHome: 'ZAP_DEFAULT', 
+                         port: 8080, 
+                         host: 'localhost'
+            }
+        }
+        stage('Scan URL') {
+            steps {
+                zapAttack url: 'http://example.com', // Cambia esto por la URL que quieres escanear
+                          contextName: '',
+                          recurse: true,
+                          scanPolicyName: '',
+                          apikey: '' // Si configuraste un API key en ZAP, colócalo aquí
+            }
+        }
+        stage('Generate Report') {
+            steps {
+                script {
+                    // Generar y guardar el reporte HTML
+                    def reportPath = 'zap_report.html'
+                    zapReport reportType: 'HTML',
+                              fileName: reportPath
+                    archiveArtifacts artifacts: reportPath
+                }
+            }
+        }
+        stage('Stop ZAP') {
+            steps {
+                zapStop()
+            }
+        }
+    }
+}
