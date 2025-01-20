@@ -12,7 +12,50 @@ pipeline {
         REPORT_JSON = 'zap-report.json'
         REPORT_HTML = 'zap-report.html'
     }
+
+     
     stages {
+
+           stages {
+     stage('Instalar IBM Cloud CLI') {
+            steps {
+                sh 'curl -fsSL https://clis.cloud.ibm.com/install/linux | sh'
+                }
+            }
+
+        stage('Instalar IBM Cloud Container Registry Plugin') {
+            steps {
+                sh 'ibmcloud plugin install container-registry'
+            }
+        }
+        stage('Debug IBM Cloud Login Inputs') {
+            steps {
+                echo "API Key: ${env.IBM_CLOUD_API_KEY}" 
+            }
+        }
+        stage('Login to IBM Cloud') {
+             steps {
+                withCredentials([string(credentialsId: 'IBM_CLOUD_API_KEY', variable: 'API_KEY')]) {
+                    sh 'ibmcloud login --apikey ${API_KEY} -r eu-gb'
+                }
+            }
+        }
+        stage('Target Resource Group') {
+            steps {
+                sh 'ibmcloud target -g Stemdo_Sandbox'
+            }
+        }
+        stage('Configurar IBM Cloud Container Registry') {
+            steps {
+                script {
+                    sh '''
+                    ibmcloud cr region-set global
+                    ibmcloud cr login
+                    '''
+                }
+            }
+        }
+
         stage('Run OWASP ZAP') {
             steps {
                 script {
@@ -29,6 +72,7 @@ pipeline {
             }
         }
     }
+
     post {
         always {
             script {
