@@ -8,14 +8,41 @@ pipeline {
     parameters {
         string(name: 'TARGET_URL', defaultValue: '', description: 'URL a probar')
     }
+    environment {
+        WORKSPACE_DIR = "${pwd()}" // Directorio actual para reportes
+    }
     stages {
-        stage('Run ZAP Scan') {
+        stage('Download OWASP ZAP Docker Image') {
             steps {
                 script {
-                    // Ejecuta ZAP con compatibilidad para sh
+                    // Descarga la imagen de OWASP ZAP
                     sh """
-                        docker run --rm -v \$(pwd):/zap/wrk:rw zaproxy/zap2docker-stable:latest \
-                        zap-full-scan.py -t "$TARGET_URL" -J zap-report.json
+                        docker pull owasp/zap2docker-stable
+                    """
+                }
+            }
+        }
+        stage('Run OWASP ZAP Container') {
+            steps {
+                script {
+                    // Inicia el contenedor en modo demonio
+                    sh """
+                        docker run -d --name owasp-zap \
+                        -v ${WORKSPACE_DIR}:/zap/wrk:rw \
+                        owasp/zap2docker-stable /bin/bash
+                    """
+                }
+            }
+        }
+        stage('Execute ZAP Full Scan') {
+            steps {
+                script {
+                    // Ejecuta el script zap-full-scan.py dentro del contenedor
+                    sh """
+                        docker exec owasp-zap zap-full-scan.py \
+                        -t "${params.TARGET_URL}" \
+                        -J /zap/wrk/zap-report.json \
+                        -r /zap/wrk/zap-report.html
                     """
                 }
             }
@@ -23,7 +50,21 @@ pipeline {
     }
     post {
         always {
-            archiveArtifacts artifacts: 'zap-report.json', fingerprint: true
+            script {
+                // Detiene y elimina el contenedor después del uso
+                sh """
+                    docker stop owasp-zap || true
+                    docker rm owasp-zap || true
+                """
+            }
+            // Archiva los reportes generados como artefactos
+            archiveArtifacts artifacts: '*.json, *.html', fingerprint: true
+        }
+        success {
+            echo "OWASP ZAP Full Scan completado con éxito."
+        }
+        failure {
+            echo "El OWASP ZAP Full Scan detectó problemas."
         }
     }
 }
