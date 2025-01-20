@@ -53,12 +53,13 @@ pipeline {
                 script {
                     echo "Ejecutando OWASP ZAP..."
                     sh """
-                        docker run --rm \
-                        -v ${WORKSPACE}:/zap/wrk:rw \
-                          icr.io/ctenorio-cr/zap2docker-stable:latest zap-baseline.py \
+                        docker pull icr.io/ctenorio-cr/zap2docker-stable:latest
+                        docker run -d --name zap-container icr.io/ctenorio-cr/zap2docker-stable:latest
+
+                        docker exec zap-container zap-full-scan.py \
                         -t "${params.TARGET_URL}" \
-                        -J /zap/wrk/${REPORT_JSON} \
-                        -r /zap/wrk/${REPORT_HTML}
+                        -r ${REPORT_HTML} \
+                        -I
                     """
                 }
             }
