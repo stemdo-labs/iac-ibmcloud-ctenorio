@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            label 'jenkins-jenkins-agent'
+            defaultContainer 'dind'
+        }
+    }
     parameters {
         string(name: 'TARGET_URL', defaultValue: 'https://example.com', description: 'URL a probar')
     }
