@@ -15,14 +15,9 @@ pipeline {
             steps {
                 echo 'Downloading OWASP ZAP...'
                 sh '''
-                # Crear directorio de instalación
                 mkdir -p ${ZAP_INSTALL_DIR}
-                
-                # Descargar y extraer OWASP ZAP
                 curl -L ${ZAP_DOWNLOAD_URL} -o zap.tar.gz
                 tar -xvzf zap.tar.gz -C ${ZAP_INSTALL_DIR} --strip-components=1
-                
-                # Hacer ejecutable el script de ZAP
                 chmod +x ${ZAP_INSTALL_DIR}/zap.sh
                 '''
             }
@@ -31,10 +26,7 @@ pipeline {
             steps {
                 echo 'Starting OWASP ZAP in daemon mode...'
                 sh '''
-                # Inicia ZAP como demonio
                 ${ZAP_INSTALL_DIR}/zap.sh -daemon -host 127.0.0.1 -port 8080 -config api.disablekey=true &
-                
-                # Esperar a que ZAP esté listo
                 sleep 10
                 '''
             }
@@ -43,8 +35,6 @@ pipeline {
             steps {
                 echo "Running ZAP Quick Scan on ${params.TARGET_URL}..."
                 sh '''
-                #!/bin/bash
-                # Realizar un escaneo rápido en la URL objetivo
                 ${ZAP_INSTALL_DIR}/zap-cli quick-scan --self-contained \
                 --start-options "-config api.disablekey=true" \
                 ${params.TARGET_URL}
@@ -55,10 +45,16 @@ pipeline {
             steps {
                 echo "Generating ZAP Report in ${params.REPORT_FORMAT} format..."
                 sh '''
-                #!/bin/bash
-                # Generar reporte en el formato especificado
                 ${ZAP_INSTALL_DIR}/zap-cli report \
                 -o ${REPORT_FILE} \
+                -f ${params.REPORT_FORMAT}
+                '''
+            }
+        }
+        stage('Archive Report') {
+            steps {
+                echo 'Archiving ZAP Report...'
+                archiveArtifacts artifacts: "${REPORT_FILE}", allowEmptyArchive: false
             }
         }
     }
@@ -66,7 +62,6 @@ pipeline {
         always {
             echo 'Cleaning up...'
             sh '''
-            #!/bin/bash
             rm -rf ${ZAP_INSTALL_DIR} zap.tar.gz ${REPORT_FILE}
             '''
         }
