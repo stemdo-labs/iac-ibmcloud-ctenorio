@@ -56,34 +56,19 @@ spec:
             }
         }
 
-    stage('Check Critical Issues') {
+
+        stage('Check Critical Issues') {
             steps {
-                container('zap') {
-                    script {
-                        // Verificar si los reportes fueron generados correctamente
-                        sh """
-                        if [ ! -f "${WORKSPACE}/${env.JSON_REPORT}" ]; then
-                            echo "El archivo JSON no se generó correctamente."
-                            exit 1
-                        fi
-                        """
+                script {
+                    def jsonReport = readJSON file: "${WORKSPACE}/${env.JSON_REPORT}"
+                    def criticalAlerts = jsonReport.site[0].alerts.findAll { it.riskcode == '2' }
 
-                        // Leer el reporte JSON generado
-                        def jsonReport = readJSON file: "${WORKSPACE}/${env.JSON_REPORT}"
-
-                        // Filtrar vulnerabilidades críticas (riskcode == '2')
-                        def criticalAlerts = jsonReport.site[0].alerts.findAll { it.riskcode == '2' }
-
-                        // Manejar vulnerabilidades críticas
-                        if (criticalAlerts.size() > 0) {
-                            echo "Se encontraron vulnerabilidades críticas:"
-                            criticalAlerts.each { alert ->
-                                echo "[CRÍTICO] - ${alert.alertRef}.${alert.name}: ${alert.desc}"
-                            }
-                            error("El pipeline falló debido a vulnerabilidades críticas detectadas.")
-                        } else {
-                            echo "No se encontraron vulnerabilidades críticas. Continuando..."
+                    if (criticalAlerts.size() > 0) {
+                        echo "Se encontraron vulnerabilidades críticas:"
+                        criticalAlerts.each { alert ->
+                            echo "- ${alert.alertRef}.${alert.name}: ${alert.desc}"
                         }
+                        error("La pipeline falló debido a vulnerabilidades críticas detectadas.Revisa los reportes generados o los logs de la pipeline.")
                     }
                 }
             }
