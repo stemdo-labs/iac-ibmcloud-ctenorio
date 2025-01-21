@@ -11,13 +11,6 @@ spec:
     command:
     - cat
     tty: true
-    resources:
-      requests:
-        memory: "512Mi"
-        cpu: "500m"
-      limits:
-        memory: "1Gi"
-        cpu: "1"
     volumeMounts:
     - name: workspace-volume
       mountPath: /zap/wrk
@@ -41,6 +34,9 @@ spec:
                         echo "Ejecutando OWASP ZAP en Kubernetes..."
                         zap.sh -cmd -quickurl ${TARGET_URL} -quickout /zap/wrk/${REPORT_NAME}
                         """
+                        
+                        // Copiar reporte al workspace de Jenkins
+                        sh "cp /zap/wrk/${REPORT_NAME} ${WORKSPACE}/"
                     }
                 }
             }
@@ -49,7 +45,8 @@ spec:
     post {
         always {
             echo "Generando reporte..."
-            archiveArtifacts artifacts: "zap_report.html", allowEmptyArchive: true
+            // Archivar el reporte desde el workspace
+            archiveArtifacts artifacts: "${REPORT_NAME}", allowEmptyArchive: true
         }
     }
 }
