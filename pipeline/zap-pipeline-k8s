@@ -43,7 +43,7 @@ spec:
     post {
         always {
             echo "Generando reporte..."
-            archiveArtifacts artifacts: "${REPORT_NAME}", allowEmptyArchive: true
+            archiveArtifacts artifacts: "/zap/wrk/${REPORT_NAME}", allowEmptyArchive: true
         }
     }
 }
