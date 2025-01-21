@@ -25,9 +25,9 @@ pipeline {
         stage('Start ZAP') {
             steps {
                 echo 'Starting OWASP ZAP in daemon mode...'
-                sh '''
-                ${ZAP_INSTALL_DIR}/zap.sh -daemon -host 127.0.0.1 -port 8080 -config api.disablekey=true &
-                sleep 10
+                    sh '''
+                    ${ZAP_INSTALL_DIR}/zap.sh -daemon -host 127.0.0.1 -port 8080 -config api.disablekey=true &
+                    sleep 10
                 '''
             }
         }
@@ -35,9 +35,9 @@ pipeline {
             steps {
                 echo "Running ZAP Quick Scan on ${params.TARGET_URL}..."
                 sh '''
-                ${ZAP_INSTALL_DIR}/zap-cli quick-scan --self-contained \
-                --start-options "-config api.disablekey=true" \
-                ${params.TARGET_URL}
+                    ${ZAP_INSTALL_DIR}/zap-cli quick-scan --self-contained \
+                    --start-options "-config api.disablekey=true" \
+                    ${params.TARGET_URL}
                 '''
             }
         }
@@ -45,10 +45,10 @@ pipeline {
             steps {
                 echo "Generating ZAP Report in ${params.REPORT_FORMAT} format..."
                 sh '''
-                ${ZAP_INSTALL_DIR}/zap-cli report \
-                -o ${REPORT_FILE} \
-                -f ${params.REPORT_FORMAT}
-                '''
+                    ${ZAP_INSTALL_DIR}/zap-cli report \
+                    -o ${REPORT_FILE} \
+                    -f ${params.REPORT_FORMAT}
+                    '''
             }
         }
         stage('Archive Report') {
