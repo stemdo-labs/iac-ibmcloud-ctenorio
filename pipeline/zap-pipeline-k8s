@@ -66,9 +66,7 @@ spec:
                         criticalAlerts.each { alert ->
                             echo "- ${alert.alertRef}.${alert.name}: ${alert.desc}"
                         }
-                        error("El pipeline falló debido a vulnerabilidades críticas detectadas.")
-                    } else {
-                        echo "No se encontraron vulnerabilidades críticas."
+                        error("El pipeline falló debido a vulnerabilidades críticas detectadas.Revisa los reportes generados o los logs de la pipeline.")
                     }
                 }
             }
@@ -80,6 +78,11 @@ spec:
             echo "Generando reportes..."
             // Archivar los reportes generados
             archiveArtifacts artifacts: "${params.HTML_REPORT}, ${params.JSON_REPORT}, ${params.XML_REPORT}", allowEmptyArchive: true
+        }
+        failure {
+            echo "El pipeline ha fallado. Enviando notificación a Teams..."
+            office365ConnectorSend message: "Pipeline falló debido a vulnerabilidades críticas detectadas. Revisa los reportes generados o los logs de la pipeline.",
+                                  status: 'FAILED'
         }
     
     }
