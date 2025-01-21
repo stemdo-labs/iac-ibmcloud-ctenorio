@@ -1,92 +1,56 @@
 pipeline {
     agent any
-    parameters {
-        string(name: 'TARGET_URL', defaultValue: 'http://example.com', description: 'URL de la aplicación a escanear')
-        choice(name: 'REPORT_FORMAT', choices: ['html', 'json', 'xml'], description: 'Formato del reporte ZAP')
-    }
     environment {
-        ZAP_VERSION = '2.16.0' // Cambia esto a la versión que necesites
-        ZAP_DOWNLOAD_URL = "https://github.com/zaproxy/zaproxy/releases/download/v${ZAP_VERSION}/ZAP_${ZAP_VERSION}_Linux.tar.gz"
-        ZAP_INSTALL_DIR = './zap' // Directorio temporal para ZAP
-        REPORT_FILE = "zap-report.${params.REPORT_FORMAT}"
+        ZAP_VERSION = '2.16.0' // Versión de OWASP ZAP que deseas instalar
+        ZAP_DOWNLOAD_URL = 'https://github.com/zaproxy/zaproxy/releases/download'
+        TARGET_URL = 'http://example.com' // URL objetivo a escanear
+        REPORT_NAME = 'zap_report.html' // Nombre del reporte generado
     }
     stages {
-     stage('Install pip') {
+        stage('Install Dependencies') {
             steps {
-                echo 'Installing pip...'
-                sh '''
-                #!/bin/bash
-                curl -sS https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-                python3 get-pip.py --user
-                export PATH=$HOME/.local/bin:$PATH
-                '''
+                script {
+                    // Instalar dependencias necesarias
+                    sh """
+                    echo "Instalando dependencias..."
+                    sudo apt-get update
+                    sudo apt-get install -y openjdk-11-jre wget unzip
+                    """
+                }
             }
         }
-        stage('Install zap-cli') {
+        stage('Download OWASP ZAP') {
             steps {
-                echo 'Installing zap-cli...'
-                sh '''
-                #!/bin/bash
-                export PATH=$HOME/.local/bin:$PATH
-                pip install zap-cli
-                '''
+                script {
+                    // Descargar e instalar OWASP ZAP
+                    sh """
+                    echo "Descargando OWASP ZAP versión ${ZAP_VERSION}..."
+                    wget -q ${ZAP_DOWNLOAD_URL}/v${ZAP_VERSION}/ZAP_${ZAP_VERSION}_Core.zip -O zap.zip
+                    unzip -o zap.zip -d zap
+                    rm zap.zip
+                    """
+                }
             }
         }
-
-        stage('Download ZAP') {
+        stage('Run OWASP ZAP Scan') {
             steps {
-                echo 'Downloading OWASP ZAP...'
-                sh '''
-                mkdir -p ${ZAP_INSTALL_DIR}
-                curl -L ${ZAP_DOWNLOAD_URL} -o zap.tar.gz
-                tar -xvzf zap.tar.gz -C ${ZAP_INSTALL_DIR} --strip-components=1
-                chmod +x ${ZAP_INSTALL_DIR}/zap.sh
-                '''
-            }
-        }
-
-        stage('Start ZAP') {
-            steps {
-                echo 'Starting OWASP ZAP in daemon mode...'
-                    sh '''
-                    ${ZAP_INSTALL_DIR}/zap.sh -daemon -host 127.0.0.1 -port 8080 -config api.disablekey=true &
-                    sleep 10
-                '''
-            }
-        }
-        stage('Run ZAP Scan') {
-            steps {
-                echo "Running ZAP Quick Scan on ${params.TARGET_URL}..."
-                sh '''
-                    ./zap/zap-cli quick-scan --self-contained \
-                    --start-options "-config api.disablekey=true" \
-                    http://example.com
-                '''
-            }
-        }
-        stage('Generate Report') {
-            steps {
-                echo "Generating ZAP Report in ${params.REPORT_FORMAT} format..."
-                sh '''
-                    ./zap/zap-cli report \
-                    -o http://example.com \
-                    -f html
-                    '''
-            }
-        }
-        stage('Archive Report') {
-            steps {
-                echo 'Archiving ZAP Report...'
-                archiveArtifacts artifacts: "${REPORT_FILE}", allowEmptyArchive: false
+                script {
+                    // Ejecutar el análisis rápido de ZAP
+                    sh """
+                    echo "Ejecutando OWASP ZAP Scan..."
+                    zap/zap.sh -cmd -quickurl ${TARGET_URL} -quickout ${REPORT_NAME} -quickprogress
+                    """
+                }
             }
         }
     }
     post {
         always {
-            echo 'Cleaning up...'
-            sh '''
-            rm -rf ${ZAP_INSTALL_DIR} zap.tar.gz ${REPORT_FILE}
-            '''
+            echo "Generando reporte..."
+            archiveArtifacts artifacts: "${REPORT_NAME}", allowEmptyArchive: true
+        }
+        failure {
+            echo "El análisis de OWASP ZAP falló."
         }
     }
 }
