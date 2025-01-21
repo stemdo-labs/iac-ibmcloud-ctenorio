@@ -1,23 +1,18 @@
 pipeline {
-    agent {
-        docker {
-            image 'zaproxy/zap-stable'
-            args '-u root' // Ejecuta como root para evitar problemas de permisos
-        }
-    }
+    agent any
     environment {
-        TARGET_URL = 'http://example.com' // URL objetivo
-        REPORT_NAME = 'zap_report.html'   // Nombre del reporte
-        ZAP_PORT = '8090'                 // Puerto para OWASP ZAP
+        TARGET_URL = 'http://example.com'
+        REPORT_NAME = 'zap_report.html'
+        ZAP_PORT = '8090'
     }
     stages {
-        stage('Run OWASP ZAP') {
+        stage('Run OWASP ZAP with Docker') {
             steps {
                 script {
-                    // Ejecutar el análisis con OWASP ZAP
+                    // Ejecutar OWASP ZAP usando Docker
                     sh """
-                    echo "Ejecutando OWASP ZAP Scan..."
-                    zap.sh -cmd -quickurl ${TARGET_URL} -quickout ${REPORT_NAME}
+                    echo "Ejecutando OWASP ZAP usando Docker..."
+                    docker run --rm -u root -v \$(pwd):/zap/wrk:rw -t zaproxy/zap-stable zap.sh -cmd -quickurl ${TARGET_URL} -quickout /zap/wrk/${REPORT_NAME}
                     """
                 }
             }
