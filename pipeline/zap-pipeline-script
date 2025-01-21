@@ -1,0 +1,76 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'TARGET_URL', defaultValue: 'http://example.com', description: 'URL de la aplicación a escanear')
+        choice(name: 'REPORT_FORMAT', choices: ['html', 'json', 'xml'], description: 'Formato del reporte ZAP')
+    }
+    environment {
+        ZAP_VERSION = '2.13.0' // Cambia esto a la versión que necesites
+        ZAP_DOWNLOAD_URL = "https://github.com/zaproxy/zaproxy/releases/download/v${ZAP_VERSION}/ZAP_${ZAP_VERSION}_Linux.tar.gz"
+        ZAP_INSTALL_DIR = './zap' // Directorio temporal para ZAP
+        REPORT_FILE = "zap-report.${params.REPORT_FORMAT}"
+    }
+    stages {
+        stage('Download ZAP') {
+            steps {
+                echo 'Downloading OWASP ZAP...'
+                sh '''
+                # Crear directorio de instalación
+                mkdir -p ${ZAP_INSTALL_DIR}
+                
+                # Descargar y extraer OWASP ZAP
+                curl -L ${ZAP_DOWNLOAD_URL} -o zap.tar.gz
+                tar -xvzf zap.tar.gz -C ${ZAP_INSTALL_DIR} --strip-components=1
+                
+                # Hacer ejecutable el script de ZAP
+                chmod +x ${ZAP_INSTALL_DIR}/zap.sh
+                '''
+            }
+        }
+        stage('Start ZAP') {
+            steps {
+                echo 'Starting OWASP ZAP in daemon mode...'
+                sh '''
+                # Inicia ZAP como demonio
+                ${ZAP_INSTALL_DIR}/zap.sh -daemon -host 127.0.0.1 -port 8080 -config api.disablekey=true &
+                
+                # Esperar a que ZAP esté listo
+                sleep 10
+                '''
+            }
+        }
+        stage('Run ZAP Scan') {
+            steps {
+                echo "Running ZAP Quick Scan on ${params.TARGET_URL}..."
+                sh '''
+                # Realizar un escaneo rápido en la URL objetivo
+                ${ZAP_INSTALL_DIR}/zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' ${params.TARGET_URL}
+                '''
+            }
+        }
+        stage('Generate Report') {
+            steps {
+                echo "Generating ZAP Report in ${params.REPORT_FORMAT} format..."
+                sh '''
+                # Generar reporte en el formato especificado
+                ${ZAP_INSTALL_DIR}/zap-cli report -o ${REPORT_FILE} -f ${params.REPORT_FORMAT}
+                '''
+            }
+        }
+        stage('Archive Report') {
+            steps {
+                echo 'Archiving ZAP Report...'
+                archiveArtifacts artifacts: "${REPORT_FILE}", allowEmptyArchive: false
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Cleaning up...'
+            sh '''
+            # Limpiar archivos temporales
+            rm -rf ${ZAP_INSTALL_DIR} zap.tar.gz ${REPORT_FILE}
+            '''
+        }
+    }
+}
