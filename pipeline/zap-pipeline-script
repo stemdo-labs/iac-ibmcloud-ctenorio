@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            label 'jenkins-jenkins-agent'
+            defaultContainer 'dind'
+        }
+    }
     environment {
         ZAP_VERSION = '2.16.0' // Versión de OWASP ZAP que deseas instalar
         ZAP_DOWNLOAD_URL = 'https://github.com/zaproxy/zaproxy/releases/download'
