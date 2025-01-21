@@ -79,11 +79,17 @@ spec:
             // Archivar los reportes generados
             archiveArtifacts artifacts: "${params.HTML_REPORT}, ${params.JSON_REPORT}, ${params.XML_REPORT}", allowEmptyArchive: true
         }
-        failure {
-            echo "El pipeline ha fallado. Enviando notificación a Teams..."
-            office365ConnectorSend message: "Pipeline falló debido a vulnerabilidades críticas detectadas. Revisa los reportes generados o los logs de la pipeline.",
-                                  status: 'FAILED'
+         failure {
+            withCredentials([string(credentialsId: 'TEAMS_WEBHOOK_SECRET', variable: 'TEAMS_WEBHOOK_URL')]) {
+                echo "El pipeline ha fallado. Enviando notificación a Teams..."
+                office365ConnectorSend message: """
+                    El pipeline '${env.JOB_NAME}' falló en el build #${env.BUILD_NUMBER}.
+                    URL objetivo: ${params.TARGET_URL}.
+                    Más detalles: ${env.BUILD_URL}.
+                """,
+                status: 'FAILED',
+                webhookUrl: "${TEAMS_WEBHOOK_URL}"
+            }
         }
-    
     }
 }
