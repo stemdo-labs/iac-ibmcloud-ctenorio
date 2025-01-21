@@ -27,7 +27,7 @@ pipeline {
                     // Ejecutar el análisis con OWASP ZAP
                     sh """
                     echo "Ejecutando OWASP ZAP Scan..."
-                      ./ZAP_${ZAP_VERSION}/zap.sh -cmd -port ${ZAP_PORT} -quickurl ${TARGET_URL} -quickout  $(pwd)/${REPORT_NAME}
+                      ./ZAP_${ZAP_VERSION}/zap.sh -cmd -port ${ZAP_PORT} -quickurl ${TARGET_URL} -quickout \$(pwd)/${REPORT_NAME}
                     """
                 }
             }
