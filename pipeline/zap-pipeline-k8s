@@ -22,9 +22,12 @@ spec:
     }
     parameters {
         string(name: 'TARGET_URL', defaultValue: 'http://example.com', description: 'URL objetivo para el análisis')
-        string(name: 'REPORT_NAME_HTML', defaultValue: 'zap_report.html', description: 'Nombre del reporte en HTML')
-        string(name: 'REPORT_NAME_XML', defaultValue: 'zap_report.xml', description: 'Nombre del reporte en XML')
-        string(name: 'REPORT_NAME_JSON', defaultValue: 'zap_report.json', description: 'Nombre del reporte en JSON')
+    }
+    environment {
+        REPORT_DIR = '/zap/wrk' // Directorio para guardar reportes
+        HTML_REPORT = 'zap_report.html' // Reporte HTML
+        JSON_REPORT = 'zap_report.json' // Reporte JSON
+        XML_REPORT = 'zap_report.xml'   // Reporte XML
     }
     stages {
         stage('Run OWASP ZAP') {
@@ -32,18 +35,18 @@ spec:
                 container('zap') {
                     script {
                         // Crear el directorio para reportes
-                        sh "mkdir -p /zap/wrk"
+                        sh "mkdir -p ${env.REPORT_DIR}"
 
                         // Ejecutar OWASP ZAP y generar reportes en diferentes formatos
                         sh """
                         echo "Ejecutando OWASP ZAP en Kubernetes..."
-                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout /zap/wrk/${params.REPORT_NAME_HTML}
-                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout /zap/wrk/${params.REPORT_NAME_XML} -reportxml
-                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout /zap/wrk/${params.REPORT_NAME_JSON} -reportjson
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.HTML_REPORT}
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.JSON_REPORT}
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.XML_REPORT}
                         """
 
-                        // Copiar reportes al workspace
-                        sh "cp /zap/wrk/* ${WORKSPACE}/"
+                        // Copiar reportes al workspace de Jenkins
+                        sh "cp ${env.REPORT_DIR}/* ${WORKSPACE}/"
                     }
                 }
             }
@@ -53,7 +56,7 @@ spec:
         always {
             echo "Generando reportes..."
             // Archivar los reportes generados
-            archiveArtifacts artifacts: "${params.REPORT_NAME_HTML}, ${params.REPORT_NAME_XML}, ${params.REPORT_NAME_JSON}", allowEmptyArchive: true
+            archiveArtifacts artifacts: "${HTML_REPORT}, ${JSON_REPORT}, ${XML_REPORT}", allowEmptyArchive: true
         }
     }
 }
