@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        ZAP_VERSION = '2.13.0'
+        ZAP_VERSION = '2.16.0'
         ZAP_DOWNLOAD_URL = 'https://github.com/zaproxy/zaproxy/releases/download'
         TARGET_URL = 'http://example.com'
         REPORT_NAME = 'zap_report.html'
