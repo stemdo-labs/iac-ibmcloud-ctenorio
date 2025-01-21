@@ -22,6 +22,16 @@ pipeline {
                 '''
             }
         }
+
+        stage('Install zap-cli') {
+            steps {
+                echo 'Installing zap-cli...'
+                sh '''
+                #!/bin/bash
+                pip install zap-cli
+                '''
+            }
+        }
         stage('Start ZAP') {
             steps {
                 echo 'Starting OWASP ZAP in daemon mode...'
