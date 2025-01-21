@@ -61,6 +61,7 @@ pipeline {
                 -o ${REPORT_FILE} \
             }
         }
+    }
     post {
         always {
             echo 'Cleaning up...'
