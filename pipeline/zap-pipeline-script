@@ -5,7 +5,7 @@ pipeline {
         choice(name: 'REPORT_FORMAT', choices: ['html', 'json', 'xml'], description: 'Formato del reporte ZAP')
     }
     environment {
-        ZAP_VERSION = '2.13.0' // Cambia esto a la versión que necesites
+        ZAP_VERSION = '2.16.0' // Cambia esto a la versión que necesites
         ZAP_DOWNLOAD_URL = "https://github.com/zaproxy/zaproxy/releases/download/v${ZAP_VERSION}/ZAP_${ZAP_VERSION}_Linux.tar.gz"
         ZAP_INSTALL_DIR = './zap' // Directorio temporal para ZAP
         REPORT_FILE = "zap-report.${params.REPORT_FORMAT}"
