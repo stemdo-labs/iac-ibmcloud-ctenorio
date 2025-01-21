@@ -65,7 +65,6 @@ pipeline {
         always {
             echo 'Cleaning up...'
             sh '''
-            # Limpiar archivos temporales
             rm -rf ${ZAP_INSTALL_DIR} zap.tar.gz ${REPORT_FILE}
             '''
         }
