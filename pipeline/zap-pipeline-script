@@ -35,9 +35,9 @@ pipeline {
             steps {
                 echo "Running ZAP Quick Scan on ${params.TARGET_URL}..."
                 sh '''
-                    ${ZAP_INSTALL_DIR}/zap-cli quick-scan --self-contained \
+                    ./zap/zap-cli quick-scan --self-contained \
                     --start-options "-config api.disablekey=true" \
-                    ${params.TARGET_URL}
+                    http://example.com
                 '''
             }
         }
@@ -45,9 +45,9 @@ pipeline {
             steps {
                 echo "Generating ZAP Report in ${params.REPORT_FORMAT} format..."
                 sh '''
-                    ${ZAP_INSTALL_DIR}/zap-cli report \
-                    -o ${REPORT_FILE} \
-                    -f ${params.REPORT_FORMAT}
+                    ./zap/zap-cli report \
+                    -o http://example.com \
+                    -f html
                     '''
             }
         }
