@@ -39,10 +39,13 @@ spec:
 
                         // Ejecutar OWASP ZAP y generar reportes en diferentes formatos
                         sh """
-                        echo "Ejecutando OWASP ZAP en Kubernetes..."
-                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.HTML_REPORT}
-                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.JSON_REPORT}
-                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.XML_REPORT}
+                        echo "Ejecutando OWASP ZAP Full Scan..."
+                        python3 /zap/zap-full-scan.py \
+                            -t ${params.TARGET_URL} \
+                            -r ${env.REPORT_DIR}/${env.HTML_REPORT} \
+                            -J ${env.REPORT_DIR}/${env.JSON_REPORT} \
+                            -x ${env.REPORT_DIR}/${env.XML_REPORT} \
+                            -d
                         """
 
                         // Copiar solo los reportes al workspace de Jenkins
