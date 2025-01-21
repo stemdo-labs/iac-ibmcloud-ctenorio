@@ -40,12 +40,10 @@ spec:
                         // Ejecutar OWASP ZAP y generar reportes en diferentes formatos
                         sh """
                         echo "Ejecutando OWASP ZAP Full Scan..."
-                        sh ""
-                            echo "Ejecutando OWASP ZAP en Kubernetes..."
-                            zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.HTML_REPORT}
-                            zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.JSON_REPORT}
-                            zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.XML_REPORT}
-                        ""
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.HTML_REPORT}
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.JSON_REPORT}
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.XML_REPORT}
+                        """
 
                         // Copiar solo los reportes al workspace de Jenkins
                         sh "cp ${env.REPORT_DIR}/${env.HTML_REPORT} ${WORKSPACE}/"
@@ -55,7 +53,6 @@ spec:
                 }
             }
         }
-
 
         stage('Check Critical Issues') {
             steps {
@@ -68,7 +65,7 @@ spec:
                         criticalAlerts.each { alert ->
                             echo "- ${alert.alertRef}.${alert.name}: ${alert.desc}"
                         }
-                        error("La pipeline falló debido a vulnerabilidades críticas detectadas.Revisa los reportes generados o los logs de la pipeline.")
+                        error("La pipeline falló debido a vulnerabilidades críticas detectadas. Revisa los reportes generados o los logs de la pipeline.")
                     }
                 }
             }
@@ -85,17 +82,14 @@ spec:
         failure {
             withCredentials([string(credentialsId: 'TEAMS_WEBHOOK_URL', variable: 'TEAMS_WEBHOOK_URL')]) {
                 echo "El pipeline ha fallado. Enviando notificación a Teams..."
-                office365ConnectorSend message: """
-                    **Pipeline Fallido**
-                    
-                    - **Job Name**: ${env.JOB_NAME}
-                    - **Build Number**: ${env.BUILD_NUMBER}
-                    - **URL**: [Ver detalles del Build](${env.BUILD_URL})
+                office365ConnectorSend message: """Pipeline Fallido
+Job Name: ${env.JOB_NAME}
+Build Number: ${env.BUILD_NUMBER}
+URL: ${env.BUILD_URL}
                 """,
                 status: 'FAILED',
                 webhookUrl: TEAMS_WEBHOOK_URL
             }
         }
-
     }
 }
