@@ -53,7 +53,28 @@ spec:
                 }
             }
         }
+
+        stage('Check Critical Issues') {
+            steps {
+                script {
+                    // Verificar si hay vulnerabilidades críticas en el reporte JSON
+                    def jsonReport = readJSON file: "${env.JSON_REPORT_PATH}"
+                    def criticalAlerts = jsonReport.site[0].alerts.findAll { it.risk == 'MEdium' }
+
+                    if (criticalAlerts.size() > 0) {
+                        echo "Se encontraron vulnerabilidades críticas:"
+                        criticalAlerts.each { alert ->
+                            echo "- ${alert.name}: ${alert.description}"
+                        }
+                        error("El pipeline falló debido a vulnerabilidades críticas detectadas.")
+                    } else {
+                        echo "No se encontraron vulnerabilidades críticas."
+                    }
+                }
+            }
+        }
     }
+
     post {
         always {
             echo "Generando reportes..."
