@@ -64,7 +64,7 @@ spec:
                     if (criticalAlerts.size() > 0) {
                         echo "Se encontraron vulnerabilidades críticas:"
                         criticalAlerts.each { alert ->
-                            echo "- ${alert.name}: ${alert.description}"
+                            echo "- ${alert.alertRef}.${alert.name}: ${alert.desc}"
                         }
                         error("El pipeline falló debido a vulnerabilidades críticas detectadas.")
                     } else {
