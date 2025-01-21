@@ -1,25 +1,25 @@
 pipeline {
-    agent {
-        kubernetes {
-            label 'jenkins-jenkins-agent'
-            defaultContainer 'dind'
-        }
-    }
+    agent any
     environment {
-        ZAP_VERSION = '2.16.0' // Versión de OWASP ZAP que deseas instalar
+        ZAP_VERSION = '2.13.0'
         ZAP_DOWNLOAD_URL = 'https://github.com/zaproxy/zaproxy/releases/download'
-        TARGET_URL = 'http://example.com' // URL objetivo a escanear
-        REPORT_NAME = 'zap_report.html' // Nombre del reporte generado
+        TARGET_URL = 'http://example.com'
+        REPORT_NAME = 'zap_report.html'
     }
     stages {
-        stage('Install Dependencies') {
+        stage('Install Java Manually') {
             steps {
                 script {
-                    // Instalar dependencias necesarias
+                    // Descargar e instalar OpenJDK si no está disponible
                     sh """
-                    echo "Instalando dependencias..."
-                     apt-get update
-                     apt-get install -y openjdk-11-jre wget unzip
+                    echo "Instalando Java manualmente..."
+                    if ! java -version >/dev/null 2>&1; then
+                        mkdir -p java
+                        wget -q https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_linux-x64_bin.tar.gz -O java.tar.gz
+                        tar -xzf java.tar.gz -C java --strip-components=1
+                        rm java.tar.gz
+                        export PATH=\$PWD/java/bin:\$PATH
+                    fi
                     """
                 }
             }
@@ -27,7 +27,7 @@ pipeline {
         stage('Download OWASP ZAP') {
             steps {
                 script {
-                    // Descargar e instalar OWASP ZAP
+                    // Descargar OWASP ZAP
                     sh """
                     echo "Descargando OWASP ZAP versión ${ZAP_VERSION}..."
                     wget -q ${ZAP_DOWNLOAD_URL}/v${ZAP_VERSION}/ZAP_${ZAP_VERSION}_Core.zip -O zap.zip
@@ -40,7 +40,7 @@ pipeline {
         stage('Run OWASP ZAP Scan') {
             steps {
                 script {
-                    // Ejecutar el análisis rápido de ZAP
+                    // Ejecutar el análisis
                     sh """
                     echo "Ejecutando OWASP ZAP Scan..."
                     zap/zap.sh -cmd -quickurl ${TARGET_URL} -quickout ${REPORT_NAME} -quickprogress
@@ -53,9 +53,6 @@ pipeline {
         always {
             echo "Generando reporte..."
             archiveArtifacts artifacts: "${REPORT_NAME}", allowEmptyArchive: true
-        }
-        failure {
-            echo "El análisis de OWASP ZAP falló."
         }
     }
 }
