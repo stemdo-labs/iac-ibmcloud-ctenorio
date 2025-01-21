@@ -1,0 +1,49 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: zap
+    image: zaproxy/zap-stable
+    command:
+    - cat
+    tty: true
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1"
+"""
+        }
+    }
+    environment {
+        TARGET_URL = 'http://example.com' // URL objetivo
+        REPORT_NAME = 'zap_report.html'   // Nombre del reporte
+    }
+    stages {
+        stage('Run OWASP ZAP') {
+            steps {
+                container('zap') {
+                    script {
+                        // Ejecutar OWASP ZAP
+                        sh """
+                        echo "Ejecutando OWASP ZAP en Kubernetes..."
+                        zap.sh -cmd -quickurl ${TARGET_URL} -quickout /zap/wrk/${REPORT_NAME}
+                        """
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo "Generando reporte..."
+            archiveArtifacts artifacts: "${REPORT_NAME}", allowEmptyArchive: true
+        }
+    }
+}
