@@ -99,12 +99,11 @@ spec:
                 }
                 """
 
-                httpRequest(
-                    httpMode: 'POST',
-                    url: webhookUrl,
-                    contentType: 'APPLICATION_JSON',
-                    requestBody: message
-                )
+         // Usar curl para enviar el mensaje al Webhook de Teams
+            sh """
+            curl -X POST -H 'Content-Type: application/json' -d '${message}' '${webhookUrl}'
+            """
+              
             }
         }
     }
