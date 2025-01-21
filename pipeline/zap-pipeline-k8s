@@ -82,29 +82,5 @@ spec:
             archiveArtifacts artifacts: "${params.HTML_REPORT}, ${params.JSON_REPORT}, ${params.XML_REPORT}", allowEmptyArchive: true
         }
     
-
-     failure {
-            script {
-                def webhookUrl = credentials('TEAMS_WEBHOOK_URL')
-                def message = """
-                {
-                    "@type": "MessageCard",
-                    "@context": "http://schema.org/extensions",
-                    "themeColor": "FF0000",
-                    "summary": "Pipeline Fallido",
-                    "sections": [{
-                        "activityTitle": "Pipeline Fallido",
-                        "text": "El pipeline para el análisis de OWASP ZAP ha fallado. Verifica los reportes en Jenkins y los logs."
-                    }]
-                }
-                """
-
-         // Usar curl para enviar el mensaje al Webhook de Teams
-            sh """
-            curl -X POST -H 'Content-Type: application/json' -d '${message}' '${webhookUrl}'
-            """
-              
-            }
-        }
     }
 }
