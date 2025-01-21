@@ -35,7 +35,7 @@ spec:
                 container('zap') {
                     script {
                         // Instalar zip en el contenedor
-                        sh "apt-get update && apt-get install -y zip"
+                        sh "sudo apt-get update && sudo apt-get install -y zip"
                     }
                 }
             }
