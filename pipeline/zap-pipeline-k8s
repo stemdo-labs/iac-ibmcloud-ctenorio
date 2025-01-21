@@ -79,28 +79,21 @@ spec:
             // Archivar los reportes generados
             archiveArtifacts artifacts: "${env.HTML_REPORT}, ${env.JSON_REPORT}, ${env.XML_REPORT}", allowEmptyArchive: true
         }
+
         failure {
             withCredentials([string(credentialsId: 'TEAMS_WEBHOOK_URL', variable: 'TEAMS_WEBHOOK_URL')]) {
                 echo "El pipeline ha fallado. Enviando notificación a Teams..."
                 office365ConnectorSend message: """
-                {
-                    "summary": "Pipeline Fallido",
-                    "sections": [{
-                        "activityTitle": "Pipeline '${env.JOB_NAME}' falló",
-                        "activitySubtitle": "Build #${env.BUILD_NUMBER}",
-                        "facts": [
-                            {"name": "Job Name", "value": "${env.JOB_NAME}"},
-                            {"name": "Build Number", "value": "${env.BUILD_NUMBER}"},
-                            {"name": "URL", "value": "${env.BUILD_URL}"}
-                        ],
-                        "markdown": true
-                    }],
-                    "attachments": []
-                }
+                    **Pipeline Fallido**
+                    
+                    - **Job Name**: ${env.JOB_NAME}
+                    - **Build Number**: ${env.BUILD_NUMBER}
+                    - **URL**: [Ver detalles del Build](${env.BUILD_URL})
                 """,
                 status: 'FAILED',
                 webhookUrl: TEAMS_WEBHOOK_URL
             }
         }
+
     }
 }
