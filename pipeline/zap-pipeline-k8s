@@ -22,12 +22,12 @@ spec:
     }
     parameters {
         string(name: 'TARGET_URL', defaultValue: 'http://example.com', description: 'URL objetivo para el análisis')
+        string(name: 'HTML_REPORT', defaultValue: 'zap_report.html', description: 'Nombre del reporte en HTML')
+        string(name: 'JSON_REPORT', defaultValue: 'zap_report.json', description: 'Nombre del reporte en JSON')
+        string(name: 'XML_REPORT', defaultValue: 'zap_report.xml', description: 'Nombre del reporte en XML')
     }
     environment {
         REPORT_DIR = '/zap/wrk' // Directorio para guardar reportes
-        HTML_REPORT = 'zap_report.html' // Reporte HTML
-        JSON_REPORT = 'zap_report.json' // Reporte JSON
-        XML_REPORT = 'zap_report.xml'   // Reporte XML
     }
     stages {
         stage('Run OWASP ZAP') {
@@ -40,15 +40,15 @@ spec:
                         // Ejecutar OWASP ZAP y generar reportes en diferentes formatos
                         sh """
                         echo "Ejecutando OWASP ZAP en Kubernetes..."
-                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.HTML_REPORT}
-                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.JSON_REPORT}
-                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.XML_REPORT}
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${params.HTML_REPORT}
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${params.JSON_REPORT}
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${params.XML_REPORT}
                         """
 
                         // Copiar solo los reportes al workspace de Jenkins
-                        sh "cp ${env.REPORT_DIR}/${env.HTML_REPORT} ${WORKSPACE}/"
-                        sh "cp ${env.REPORT_DIR}/${env.JSON_REPORT} ${WORKSPACE}/"
-                        sh "cp ${env.REPORT_DIR}/${env.XML_REPORT} ${WORKSPACE}/"
+                        sh "cp ${env.REPORT_DIR}/${params.HTML_REPORT} ${WORKSPACE}/"
+                        sh "cp ${env.REPORT_DIR}/${params.JSON_REPORT} ${WORKSPACE}/"
+                        sh "cp ${env.REPORT_DIR}/${params.XML_REPORT} ${WORKSPACE}/"
                     }
                 }
             }
@@ -58,7 +58,7 @@ spec:
         always {
             echo "Generando reportes..."
             // Archivar los reportes generados
-            archiveArtifacts artifacts: "${HTML_REPORT}, ${JSON_REPORT}, ${XML_REPORT}", allowEmptyArchive: true
+            archiveArtifacts artifacts: "${params.HTML_REPORT}, ${params.JSON_REPORT}, ${params.XML_REPORT}", allowEmptyArchive: true
         }
     }
 }
