@@ -30,6 +30,17 @@ spec:
         XML_REPORT = 'report_xml.xml'
     }
     stages {
+        stage('Install zip') {
+            steps {
+                container('zap') {
+                    script {
+                        // Instalar zip en el contenedor
+                        sh "apt-get update && apt-get install -y zip"
+                    }
+                }
+            }
+        }
+
         stage('Run OWASP ZAP') {
             steps {
                 container('zap') {
