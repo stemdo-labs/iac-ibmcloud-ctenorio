@@ -45,8 +45,10 @@ spec:
                         zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${env.XML_REPORT}
                         """
 
-                        // Copiar reportes al workspace de Jenkins
-                        sh "cp ${env.REPORT_DIR}/* ${WORKSPACE}/"
+                        // Copiar solo los reportes al workspace de Jenkins
+                        sh "cp ${env.REPORT_DIR}/${env.HTML_REPORT} ${WORKSPACE}/"
+                        sh "cp ${env.REPORT_DIR}/${env.JSON_REPORT} ${WORKSPACE}/"
+                        sh "cp ${env.REPORT_DIR}/${env.XML_REPORT} ${WORKSPACE}/"
                     }
                 }
             }
