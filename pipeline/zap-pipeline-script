@@ -11,6 +11,28 @@ pipeline {
         REPORT_FILE = "zap-report.${params.REPORT_FORMAT}"
     }
     stages {
+     stage('Install pip') {
+            steps {
+                echo 'Installing pip...'
+                sh '''
+                #!/bin/bash
+                curl -sS https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+                python3 get-pip.py --user
+                export PATH=$HOME/.local/bin:$PATH
+                '''
+            }
+        }
+        stage('Install zap-cli') {
+            steps {
+                echo 'Installing zap-cli...'
+                sh '''
+                #!/bin/bash
+                export PATH=$HOME/.local/bin:$PATH
+                pip install zap-cli
+                '''
+            }
+        }
+
         stage('Download ZAP') {
             steps {
                 echo 'Downloading OWASP ZAP...'
@@ -23,15 +45,6 @@ pipeline {
             }
         }
 
-        stage('Install zap-cli') {
-            steps {
-                echo 'Installing zap-cli...'
-                sh '''
-                #!/bin/bash
-                pip install zap-cli
-                '''
-            }
-        }
         stage('Start ZAP') {
             steps {
                 echo 'Starting OWASP ZAP in daemon mode...'
