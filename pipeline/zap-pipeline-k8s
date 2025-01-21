@@ -11,6 +11,8 @@ spec:
     command:
     - cat
     tty: true
+    securityContext:
+      runAsUser: 0
     resources:
       requests:
         memory: "512Mi"
@@ -22,20 +24,18 @@ spec:
         }
     }
     environment {
-        TARGET_URL = 'http://example.com'
-        REPORT_DIR = 'zap-reports'
-        REPORT_NAME = 'zap_report.html'
-        ZIP_NAME = 'zap_reports.zip'
+        TARGET_URL = 'http://example.com' // URL objetivo
+        REPORT_NAME = 'zap_report.html'   // Nombre del reporte
     }
     stages {
         stage('Run OWASP ZAP') {
             steps {
                 container('zap') {
                     script {
-                        sh "mkdir -p ${WORKSPACE}/${REPORT_DIR}"
+                        // Ejecutar OWASP ZAP
                         sh """
                         echo "Ejecutando OWASP ZAP en Kubernetes..."
-                        zap.sh -cmd -quickurl ${TARGET_URL} -quickout ${WORKSPACE}/${REPORT_DIR}/${REPORT_NAME}
+                        zap.sh -cmd -quickurl ${TARGET_URL} -quickout /zap/wrk/${REPORT_NAME}
                         """
                     }
                 }
@@ -44,14 +44,8 @@ spec:
     }
     post {
         always {
-            script {
-                echo "Comprimiendo los reportes..."
-                sh """
-                apt-get update && apt-get install -y zip
-                cd ${WORKSPACE} && zip -r ${ZIP_NAME} ${REPORT_DIR}
-                """
-                archiveArtifacts artifacts: "${ZIP_NAME}", allowEmptyArchive: true
-            }
+            echo "Generando reporte..."
+            archiveArtifacts artifacts: "zap_report.html", allowEmptyArchive: true
         }
     }
 }
