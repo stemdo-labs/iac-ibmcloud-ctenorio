@@ -1,0 +1,32 @@
+pipeline {
+    agent {
+        docker {
+            image 'zaproxy/zap-stable'
+            args '-u root' // Ejecuta como root para evitar problemas de permisos
+        }
+    }
+    environment {
+        TARGET_URL = 'http://example.com' // URL objetivo
+        REPORT_NAME = 'zap_report.html'   // Nombre del reporte
+        ZAP_PORT = '8090'                 // Puerto para OWASP ZAP
+    }
+    stages {
+        stage('Run OWASP ZAP') {
+            steps {
+                script {
+                    // Ejecutar el análisis con OWASP ZAP
+                    sh """
+                    echo "Ejecutando OWASP ZAP Scan..."
+                    zap.sh -cmd -quickurl ${TARGET_URL} -quickout ${REPORT_NAME}
+                    """
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo "Generando reporte..."
+            archiveArtifacts artifacts: "${REPORT_NAME}", allowEmptyArchive: true
+        }
+    }
+}
