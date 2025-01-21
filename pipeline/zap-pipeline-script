@@ -5,6 +5,7 @@ pipeline {
         ZAP_DOWNLOAD_URL = 'https://github.com/zaproxy/zaproxy/releases/download' // URL base de descarga
         TARGET_URL = 'http://example.com' // URL objetivo
         REPORT_NAME = 'zap_report.html' // Nombre del reporte
+        ZAP_PORT = '8090'
     }
     stages {
         stage('Download OWASP ZAP Standalone') {
@@ -26,7 +27,7 @@ pipeline {
                     // Ejecutar el análisis con OWASP ZAP
                     sh """
                     echo "Ejecutando OWASP ZAP Scan..."
-                    ./ZAP_${ZAP_VERSION}/zap.sh -cmd -quickurl ${TARGET_URL} -quickout ${REPORT_NAME}
+                      ./ZAP_${ZAP_VERSION}/zap.sh -cmd -port ${ZAP_PORT} -quickurl ${TARGET_URL} -quickout ${REPORT_NAME}
                     """
                 }
             }
