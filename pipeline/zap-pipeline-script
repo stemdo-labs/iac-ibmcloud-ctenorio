@@ -1,49 +1,32 @@
 pipeline {
     agent any
     environment {
-        ZAP_VERSION = '2.16.0'
-        ZAP_DOWNLOAD_URL = 'https://github.com/zaproxy/zaproxy/releases/download'
-        TARGET_URL = 'http://example.com'
-        REPORT_NAME = 'zap_report.html'
+        ZAP_VERSION = '2.16.0' // Versión de ZAP
+        ZAP_DOWNLOAD_URL = 'https://github.com/zaproxy/zaproxy/releases/download' // URL base de descarga
+        TARGET_URL = 'http://example.com' // URL objetivo
+        REPORT_NAME = 'zap_report.html' // Nombre del reporte
     }
     stages {
-        stage('Install Java Manually') {
+        stage('Download OWASP ZAP Standalone') {
             steps {
                 script {
-                    // Descargar e instalar OpenJDK si no está disponible
-                    sh """
-                    echo "Instalando Java manualmente..."
-                    if ! java -version >/dev/null 2>&1; then
-                        mkdir -p java
-                        wget -q https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_linux-x64_bin.tar.gz -O java.tar.gz
-                        tar -xzf java.tar.gz -C java --strip-components=1
-                        rm java.tar.gz
-                        export PATH=\$PWD/java/bin:\$PATH
-                    fi
-                    """
-                }
-            }
-        }
-        stage('Download OWASP ZAP') {
-            steps {
-                script {
-                    // Descargar OWASP ZAP
+                    // Descargar OWASP ZAP usando curl
                     sh """
                     echo "Descargando OWASP ZAP versión ${ZAP_VERSION}..."
-                    wget -q ${ZAP_DOWNLOAD_URL}/v${ZAP_VERSION}/ZAP_${ZAP_VERSION}_Core.zip -O zap.zip
-                    unzip -o zap.zip -d zap
-                    rm zap.zip
+                    curl -sL ${ZAP_DOWNLOAD_URL}/v${ZAP_VERSION}/ZAP_${ZAP_VERSION}_Linux.tar.gz -o zap.tar.gz
+                    tar -xzf zap.tar.gz
+                    rm zap.tar.gz
                     """
                 }
             }
         }
-        stage('Run OWASP ZAP Scan') {
+        stage('Run OWASP ZAP') {
             steps {
                 script {
-                    // Ejecutar el análisis
+                    // Ejecutar el análisis con OWASP ZAP
                     sh """
                     echo "Ejecutando OWASP ZAP Scan..."
-                    zap/zap.sh -cmd -quickurl ${TARGET_URL} -quickout ${REPORT_NAME} -quickprogress
+                    ./ZAP_${ZAP_VERSION}/zap.sh -cmd -quickurl ${TARGET_URL} -quickout ${REPORT_NAME}
                     """
                 }
             }
