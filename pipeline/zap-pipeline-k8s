@@ -20,23 +20,30 @@ spec:
 """
         }
     }
-    environment {
-        TARGET_URL = 'http://example.com' // URL objetivo
-        REPORT_NAME = 'zap_report.html'   // Nombre del reporte
+    parameters {
+        string(name: 'TARGET_URL', defaultValue: 'http://example.com', description: 'URL objetivo para el análisis')
+        string(name: 'REPORT_NAME_HTML', defaultValue: 'zap_report.html', description: 'Nombre del reporte en HTML')
+        string(name: 'REPORT_NAME_XML', defaultValue: 'zap_report.xml', description: 'Nombre del reporte en XML')
+        string(name: 'REPORT_NAME_JSON', defaultValue: 'zap_report.json', description: 'Nombre del reporte en JSON')
     }
     stages {
         stage('Run OWASP ZAP') {
             steps {
                 container('zap') {
                     script {
-                        // Ejecutar OWASP ZAP
+                        // Crear el directorio para reportes
+                        sh "mkdir -p /zap/wrk"
+
+                        // Ejecutar OWASP ZAP y generar reportes en diferentes formatos
                         sh """
                         echo "Ejecutando OWASP ZAP en Kubernetes..."
-                        zap.sh -cmd -quickurl ${TARGET_URL} -quickout /zap/wrk/${REPORT_NAME}
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout /zap/wrk/${params.REPORT_NAME_HTML}
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout /zap/wrk/${params.REPORT_NAME_XML} -reportxml
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout /zap/wrk/${params.REPORT_NAME_JSON} -reportjson
                         """
-                        
-                        // Copiar reporte al workspace de Jenkins
-                        sh "cp /zap/wrk/${REPORT_NAME} ${WORKSPACE}/"
+
+                        // Copiar reportes al workspace
+                        sh "cp /zap/wrk/* ${WORKSPACE}/"
                     }
                 }
             }
@@ -44,9 +51,9 @@ spec:
     }
     post {
         always {
-            echo "Generando reporte..."
-            // Archivar el reporte desde el workspace
-            archiveArtifacts artifacts: "${REPORT_NAME}", allowEmptyArchive: true
+            echo "Generando reportes..."
+            // Archivar los reportes generados
+            archiveArtifacts artifacts: "${params.REPORT_NAME_HTML}, ${params.REPORT_NAME_XML}, ${params.REPORT_NAME_JSON}", allowEmptyArchive: true
         }
     }
 }
