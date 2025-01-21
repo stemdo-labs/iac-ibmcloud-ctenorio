@@ -43,8 +43,11 @@ pipeline {
             steps {
                 echo "Running ZAP Quick Scan on ${params.TARGET_URL}..."
                 sh '''
+                #!/bin/bash
                 # Realizar un escaneo rápido en la URL objetivo
-                \${ZAP_INSTALL_DIR}/zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' \${params.TARGET_URL}
+                ${ZAP_INSTALL_DIR}/zap-cli quick-scan --self-contained \
+                --start-options "-config api.disablekey=true" \
+                ${params.TARGET_URL}
                 '''
             }
         }
@@ -52,18 +55,12 @@ pipeline {
             steps {
                 echo "Generating ZAP Report in ${params.REPORT_FORMAT} format..."
                 sh '''
+                #!/bin/bash
                 # Generar reporte en el formato especificado
-                \${ZAP_INSTALL_DIR}/zap-cli report -o \${REPORT_FILE} -f \${params.REPORT_FORMAT}
-                '''
+                ${ZAP_INSTALL_DIR}/zap-cli report \
+                -o ${REPORT_FILE} \
             }
         }
-        stage('Archive Report') {
-            steps {
-                echo 'Archiving ZAP Report...'
-                archiveArtifacts artifacts: "${REPORT_FILE}", allowEmptyArchive: false
-            }
-        }
-    }
     post {
         always {
             echo 'Cleaning up...'
