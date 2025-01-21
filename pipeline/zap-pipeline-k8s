@@ -22,25 +22,14 @@ spec:
     }
     parameters {
         string(name: 'TARGET_URL', defaultValue: 'http://example.com', description: 'URL objetivo para el análisis')
+        string(name: 'HTML_REPORT', defaultValue: 'zap_report.html', description: 'Nombre del reporte en HTML')
+        string(name: 'JSON_REPORT', defaultValue: 'zap_report.json', description: 'Nombre del reporte en JSON')
+        string(name: 'XML_REPORT', defaultValue: 'zap_report.xml', description: 'Nombre del reporte en XML')
     }
     environment {
         REPORT_DIR = '/zap/wrk' // Directorio para guardar reportes
-        HTML_REPORT = 'report_html.html'
-        JSON_REPORT = 'report_json.json'
-        XML_REPORT = 'report_xml.xml'
     }
     stages {
-        stage('Install zip') {
-            steps {
-                container('zap') {
-                    script {
-                        // Instalar zip en el contenedor
-                        sh "sudo apt-get update && sudo apt-get install -y zip"
-                    }
-                }
-            }
-        }
-
         stage('Run OWASP ZAP') {
             steps {
                 container('zap') {
@@ -51,39 +40,34 @@ spec:
                         // Ejecutar OWASP ZAP y generar reportes en diferentes formatos
                         sh """
                         echo "Ejecutando OWASP ZAP en Kubernetes..."
-                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${HTML_REPORT}
-                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${JSON_REPORT}
-                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${XML_REPORT}
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${params.HTML_REPORT}
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${params.JSON_REPORT}
+                        zap.sh -cmd -quickurl ${params.TARGET_URL} -quickout ${env.REPORT_DIR}/${params.XML_REPORT}
                         """
 
                         // Copiar solo los reportes al workspace de Jenkins
-                        sh "cp ${env.REPORT_DIR}/${HTML_REPORT} ${WORKSPACE}/"
-                        sh "cp ${env.REPORT_DIR}/${JSON_REPORT} ${WORKSPACE}/"
-                        sh "cp ${env.REPORT_DIR}/${XML_REPORT} ${WORKSPACE}/"
+                        sh "cp ${env.REPORT_DIR}/${params.HTML_REPORT} ${WORKSPACE}/"
+                        sh "cp ${env.REPORT_DIR}/${params.JSON_REPORT} ${WORKSPACE}/"
+                        sh "cp ${env.REPORT_DIR}/${params.XML_REPORT} ${WORKSPACE}/"
                     }
                 }
             }
         }
 
-        stage('Package Reports into ZIP') {
+        stage('Check Critical Issues') {
             steps {
                 script {
-                    // Crear un directorio temporal para los reportes
-                    sh "mkdir -p ${WORKSPACE}/report_files"
-                    
-                    // Mover los reportes al directorio temporal
-                    sh "mv ${WORKSPACE}/${HTML_REPORT} ${WORKSPACE}/report_files/"
-                    sh "mv ${WORKSPACE}/${JSON_REPORT} ${WORKSPACE}/report_files/"
-                    sh "mv ${WORKSPACE}/${XML_REPORT} ${WORKSPACE}/report_files/"
-                    
-                    // Generar el nombre dinámico del ZIP
-                    def zipName = "SCAN_ZAP_${new Date().format('yyyyMMdd_HHmmss')}.zip"
-                    
-                    // Crear un archivo ZIP con el nombre dinámico
-                    sh "cd ${WORKSPACE} && zip -r ${zipName} report_files"
-                    
-                    // Exportar el nombre del ZIP para usarlo más adelante
-                    env.ZIP_NAME = zipName
+                    // Verificar si hay vulnerabilidades críticas en el reporte JSON
+                    def jsonReport = readJSON file: "${WORKSPACE}/${params.JSON_REPORT}"
+                    def criticalAlerts = jsonReport.site[0].alerts.findAll { it.riskcode == '2' }
+
+                    if (criticalAlerts.size() > 0) {
+                        echo "Se encontraron vulnerabilidades críticas:"
+                        criticalAlerts.each { alert ->
+                            echo "- ${alert.alertRef}.${alert.name}: ${alert.desc}"
+                        }
+                        error("El pipeline falló debido a vulnerabilidades críticas detectadas.Revisa los reportes generados o los logs de la pipeline.")
+                    }
                 }
             }
         }
@@ -92,17 +76,16 @@ spec:
     post {
         always {
             echo "Generando reportes..."
-            // Archivar el archivo ZIP con el nombre dinámico
-            archiveArtifacts artifacts: "${env.ZIP_NAME}", allowEmptyArchive: true
+            // Archivar los reportes generados
+            archiveArtifacts artifacts: "${params.HTML_REPORT}, ${params.JSON_REPORT}, ${params.XML_REPORT}", allowEmptyArchive: true
         }
-        failure {
+         failure {
             withCredentials([string(credentialsId: 'TEAMS_WEBHOOK_URL', variable: 'TEAMS_WEBHOOK_URL')]) {
                 echo "El pipeline ha fallado. Enviando notificación a Teams..."
                 office365ConnectorSend message: """
                     El pipeline '${env.JOB_NAME}' falló en el build #${env.BUILD_NUMBER}.
                     URL objetivo: ${params.TARGET_URL}.
                     Más detalles: ${env.BUILD_URL}.
-                    El archivo de reportes se llama: ${env.ZIP_NAME}.
                 """,
                 status: 'FAILED',
                 webhookUrl: TEAMS_WEBHOOK_URL
