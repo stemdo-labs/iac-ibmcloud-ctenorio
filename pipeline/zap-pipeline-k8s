@@ -58,7 +58,7 @@ spec:
             steps {
                 script {
                     // Verificar si hay vulnerabilidades críticas en el reporte JSON
-                    def jsonReport = readJSON file: "${env.REPORT_DIR}/${params.HTML_REPORT}"
+                    def jsonReport = readJSON file: "${env.REPORT_DIR}/${params.JSON_REPORT}"
                     def criticalAlerts = jsonReport.site[0].alerts.findAll { it.risk == 'Medium' }
 
                     if (criticalAlerts.size() > 0) {
