@@ -58,7 +58,7 @@ spec:
             steps {
                 script {
                     def jsonReport = readJSON file: "${WORKSPACE}/${env.JSON_REPORT}"
-                    def criticalAlerts = jsonReport.site[0].alerts.findAll { it.riskcode == '2' }
+                    def criticalAlerts = jsonReport.site[0].alerts.findAll { it.riskcode == '3' }
 
                     if (criticalAlerts.size() > 0) {
                         echo "Se encontraron vulnerabilidades críticas:"
